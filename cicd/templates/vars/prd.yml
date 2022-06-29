@@ -3,9 +3,9 @@ variables:
   - name: backendServiceArm
     value: 'TMX-NC-PRD-IntegrationsPipeline'
   - name: backendAzureRmResourceGroupName
-    value: 'TMX-NC-PRD-DataPlatformBagel'
+    value: 'TMX-NC-PRD-DataPlatformTemplate'
   - name: backendAzureRmStorageAccountName
-    value: 'prdbagelstorage'
+    value: 'stprdtmxcommon'
   - name: backendAzureRmKey
     value: "terraform-prd-bagel.tf"
   - name: environment

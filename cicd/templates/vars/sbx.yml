@@ -3,7 +3,7 @@ variables:
   - name: backendServiceArm
     value: 'TMX-NC-SBX-IntegrationsPipeline'
   - name: backendAzureRmResourceGroupName
-    value: 'TMX-NC-SBOX-DataPlatformBagel'
+    value: 'TMX-NC-SBOX-DataPlatformTemplate'
   - name: backendAzureRmStorageAccountName
     value: 'stsboxtmxcommon'
   - name: backendAzureRmKey

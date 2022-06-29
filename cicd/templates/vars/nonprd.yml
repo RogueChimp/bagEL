@@ -3,9 +3,9 @@ variables:
   - name: backendServiceArm
     value: 'TMX-NC-NP-IntegrationsPipeline'
   - name: backendAzureRmResourceGroupName
-    value: 'TMX-NC-NP-DataPlatformBagel'
+    value: 'TMX-NC-NP-DataPlatformTemplate'
   - name: backendAzureRmStorageAccountName
-    value: 'nonprdbagelstorage'
+    value: 'stnptmxcommon'
   - name: backendAzureRmKey
     value: "terraform-np-bagel.tf"
   - name: environment
