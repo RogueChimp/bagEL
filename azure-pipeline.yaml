@@ -47,23 +47,23 @@ steps:
       environment: ${{ variables.environment }}
       terraform_version: ${{ variables.terraform_version }}
 
-  - template: cicd/templates/docker.yaml
-    parameters:
-      repository: ${{ variables.repository }}
-      dockerfile: ${{ variables.dockerfile }}
-      containerRegistry: ${{ variables.containerRegistry }}
-      command: 'push'
-      container_sources: 
-        - okta
-        - looker
+        #  - template: cicd/templates/docker.yaml
+        #    parameters:
+        #      repository: ${{ variables.repository }}
+        #      dockerfile: ${{ variables.dockerfile }}
+        #      containerRegistry: ${{ variables.containerRegistry }}
+        #      command: 'push'
+        #      container_sources: 
+        #        - okta
+          #        - looker
 
-  - template: cicd/templates/terraform-apply.yaml
-    parameters:
-       backendServiceArm: '${{ variables.backendServiceArm }}'
-       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
-       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
-       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
-       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
-       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
-       environment: ${{ variables.environment }}
-       terraform_version: ${{ variables.terraform_version }}
+        #  - template: cicd/templates/terraform-apply.yaml
+        #    parameters:
+        #       backendServiceArm: '${{ variables.backendServiceArm }}'
+        #       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+        #       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+        #       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+        #       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
+        #       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
+        #       environment: ${{ variables.environment }}
+        #       terraform_version: ${{ variables.terraform_version }}
