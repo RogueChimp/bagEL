@@ -1,0 +1,14 @@
+variables:
+  - template: common.yml
+  - name: backendServiceArm
+    value: 'TMX-NC-SBX-IntegrationsPipeline'
+  - name: backendAzureRmResourceGroupName
+    value: 'TMX-NC-SBOX-DataPlatformBagel'
+  - name: backendAzureRmStorageAccountName
+    value: 'stsboxtmxcommon'
+  - name: backendAzureRmKey
+    value: "terraform-sbox-bagel.tf"
+  - name: environment
+    value: 'sbx'
+  - name: containerRegistry
+    value: 'crsboxtmxncbagel'

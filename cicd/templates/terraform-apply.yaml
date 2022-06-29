@@ -1,0 +1,22 @@
+steps:
+  - task: TerraformTaskV2@2
+    displayName: 'terraform init'
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      backendServiceArm: '${{ parameters.backendServiceArm }}'
+        #      backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+      backendAzureRmResourceGroupName: 'TMX-NC-SBOX-DataPlatformTemplate'
+      backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: 'terraform'
+      backendAzureRmKey: '${{ parameters.backendAzureRmKey }}' 
+      workingDirectory: '${{ parameters.workingDirectory }}'
+
+  - task: TerraformTaskV2@2
+    displayName: 'terraform apply'
+    inputs:
+      provider: 'azurerm' 
+      command: 'apply'
+      commandOptions: '-var build_id=$(Build.BuildId) -input=false -auto-approve -var-file="../tfvars/${{ parameters.environment }}/${{ parameters.environment }}.tfvars"'
+      environmentServiceNameAzureRM: '${{ parameters.backendServiceArm }}'
+      workingDirectory: '${{ parameters.workingDirectory }}'

@@ -1,0 +1,14 @@
+variables:
+  - template: common.yml
+  - name: backendServiceArm
+    value: 'TMX-NC-PRD-DevOpsPipeline'
+  - name: backendAzureRmResourceGroupName
+    value: 'TMX-NC-PRD-DataPlatformBagel'
+  - name: backendAzureRmStorageAccountName
+    value: 'prdbagelstorage'
+  - name: backendAzureRmKey
+    value: "terraform-prd-bagel.tf"
+  - name: environment
+    value: 'prd'
+  - name: containerRegistry
+    value: 'acr-prd-bagel'

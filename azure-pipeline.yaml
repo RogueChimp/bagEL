@@ -1,0 +1,69 @@
+name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
+#frustration
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+
+variables:
+  - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
+    - template: cicd/templates/vars/sbx.yml
+    - group: sbox-secrets
+    - group: sbox-variables
+    - name: env
+      value: sbx
+  - ${{ elseif eq(variables['Build.SourceBranchName'],'main') }}:
+    - template: cicd/templates/vars/nonprd.yml
+    - group: np-secrets
+    - group: np-variables
+    - name: env
+      value: nonprd
+  - ${{ elseif contains(variables['Build.SourceBranch'], "refs/tags") }}:
+    - template: cicd/templates/vars/prd.yml
+    - group: prd-secrets
+    - group: prd-variables
+    - name: env
+      value: prd
+
+steps:
+  - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+    displayName: 'Replace Tokens'
+    inputs:
+      rootDirectory: '$(Build.SourcesDirectory)/cicd/tfvars/$(env)'
+      targetFiles: '**/**'
+      enableTelemetry: false
+      actionOnMissing: continue
+
+  - template: cicd/templates/terraform-apply.yaml
+    parameters:
+      backendServiceArm: '${{ variables.backendServiceArm }}'
+      backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+      backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+      backendAzureRmKey: '${{ variables.backendAzureRmKey }}' 
+      workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform/'
+      environment: ${{ variables.environment }}
+      terraform_version: ${{ variables.terraform_version }}
+
+  - template: cicd/templates/docker.yaml
+    parameters:
+      repository: ${{ variables.repository }}
+      dockerfile: ${{ variables.dockerfile }}
+      containerRegistry: ${{ variables.containerRegistry }}
+      command: 'push'
+      container_sources: 
+        - okta
+        - looker
+
+  - template: cicd/templates/terraform-apply.yaml
+    parameters:
+       backendServiceArm: '${{ variables.backendServiceArm }}'
+       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
+       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
+       environment: ${{ variables.environment }}
+       terraform_version: ${{ variables.terraform_version }}

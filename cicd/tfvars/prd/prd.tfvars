@@ -1,0 +1,13 @@
+acr_name = "prdbagelelt"
+location = "northcentralus"
+rg_name = "TMX-NC-PRD-DataPlatformBagel"
+azure_container = #{AZURE_CONTAINER}#
+azure_table = #{AZURE_TABLE}#
+storage_account = #{STORAGE_ACCOUNT}#
+storage_account_endpoint = #{STORAGE_ACCOUNT_ENDPOINT}#
+okta_secret = #{OKTA-SECRET}#
+looker_client_id = #{LOOKER_CLIENT_ID}#
+looker_client_secret = #{LOOKER-CLIENT-SECRET}#
+looker_container_group_name = "ci-prd-tmx-nc-bagellooker"
+okta_container_group_name = "ci-prd-tmx-nc-bagelokta"
+env = prd

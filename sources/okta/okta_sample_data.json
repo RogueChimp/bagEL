@@ -1,0 +1,110 @@
+[
+    {
+        "actor": {
+            "id": "00ub0dth5uopSFy7F2p7",
+            "type": "User",
+            "alternateId": "OperationsTest4@nottrimedx.com",
+            "displayName": "Operations Test4",
+            "detailEntry": null
+        },
+        "client": {
+            "userAgent": {
+                "rawUserAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 DatadogSynthetics",
+                "os": "Linux",
+                "browser": "CHROME"
+            },
+            "zone": "null",
+            "device": "Computer",
+            "id": null,
+            "ipAddress": "3.18.197.0",
+            "geographicalContext": {
+                "city": "Columbus",
+                "state": "Ohio",
+                "country": "United States",
+                "postalCode": "43215",
+                "geolocation": {
+                    "lat": 39.9625,
+                    "lon": -83.0061
+                }
+            }
+        },
+        "device": null,
+        "authenticationContext": {
+            "authenticationProvider": null,
+            "credentialProvider": null,
+            "credentialType": null,
+            "issuer": null,
+            "interface": null,
+            "authenticationStep": 0,
+            "externalSessionId": "102Ni1BRLDLQm-WnewkKZHcbg"
+        },
+        "displayMessage": "User single sign out from app",
+        "eventType": "user.authentication.slo",
+        "outcome": {
+            "result": "SUCCESS",
+            "reason": null
+        },
+        "published": "2022-04-26T00:00:12.215Z",
+        "securityContext": {
+            "asNumber": null,
+            "asOrg": null,
+            "isp": null,
+            "domain": null,
+            "isProxy": null
+        },
+        "severity": "INFO",
+        "debugContext": {
+            "debugData": {
+                "authnRequestId": "Ymc14AeKZ0qcnVaBdXqeegAABv8",
+                "requestId": "Ymc2DOU-8nrH8FIkhtmc-gAACS0",
+                "requestUri": "/app/trimedxext_liferay_1/exka7lhjj83INt82z2p7/slo/saml",
+                "url": "/app/trimedxext_liferay_1/exka7lhjj83INt82z2p7/slo/saml?"
+            }
+        },
+        "legacyEventType": "app.auth.slo",
+        "transaction": {
+            "type": "WEB",
+            "id": "Ymc2DOU-8nrH8FIkhtmc-gAACS0",
+            "detail": {}
+        },
+        "uuid": "d8081cf3-c4f3-11ec-abee-374d7eddebb5",
+        "version": "0",
+        "request": {
+            "ipChain": [
+                {
+                    "ip": "3.18.197.0",
+                    "geographicalContext": {
+                        "city": "Columbus",
+                        "state": "Ohio",
+                        "country": "United States",
+                        "postalCode": "43215",
+                        "geolocation": {
+                            "lat": 39.9625,
+                            "lon": -83.0061
+                        }
+                    },
+                    "version": "V4",
+                    "source": null
+                }
+            ]
+        },
+        "target": [
+            {
+                "id": "0oaa7lhjj9Qkz5Pje2p7",
+                "type": "AppInstance",
+                "alternateId": "Clinical Asset Informatics",
+                "displayName": "Clinical Asset Informatics",
+                "detailEntry": {
+                    "signOnModeType": "SAML_2_0"
+                }
+            },
+            {
+                "id": "0uabmxxrepvcYuDvb2p7",
+                "type": "AppUser",
+                "alternateId": "OperationsTest4@nottrimedx.com",
+                "displayName": "Operations Test4",
+                "detailEntry": null
+            }
+        ]
+    }
+]

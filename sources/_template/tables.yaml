@@ -1,0 +1,3 @@
+tables:
+  - name: logs
+    elt_type: delta

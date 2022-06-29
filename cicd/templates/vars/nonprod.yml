@@ -1,0 +1,14 @@
+variables:
+  - template: common.yml
+  - name: backendServiceArm
+    value: 'TMX-NC-NP-DevOpsPipeline'
+  - name: backendAzureRmResourceGroupName
+    value: 'TMX-NC-NP-DataPlatformBagel'
+  - name: backendAzureRmStorageAccountName
+    value: 'nonprdbagelstorage'
+  - name: backendAzureRmKey
+    value: "terraform-np-bagel.tf"
+  - name: environment
+    value: 'nonprd'
+  - name: containerRegistry
+    value: 'acr-np-bagel'

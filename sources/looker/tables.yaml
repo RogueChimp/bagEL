@@ -1,0 +1,5 @@
+tables:
+  - name: Dashboard Query Performance
+    elt_type: full
+  - name: Monitoring_Users
+    elt_type: full

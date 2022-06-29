@@ -1,0 +1,11 @@
+variables:
+  - name: backendAzureRmContainerName
+    value: 'bagel'
+  - name: backendAzureRmKeyAci
+    value: 'terraform-aci.tfstate'
+  - name: terraform_version
+    value: '1.0.10'
+  - name: repository
+    value: 'elt-okta'
+  - name: dockerfile
+    value: '$(Build.SourcesDirectory)/Dockerfile'

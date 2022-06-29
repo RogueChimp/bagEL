@@ -1,0 +1,11 @@
+FROM python:3.9
+WORKDIR /app
+COPY . .
+RUN pip install --upgrade pip
+RUN pip install -r bagel/requirements.txt
+RUN pip install ./bagel
+RUN pip install -r bagel/sources/okta/requirements.txt
+CMD ["bagel/sources/okta/sleep.py"]
+ENTRYPOINT ["python"]
+#docker build -t elt-okta . -f bagel/sources/okta/Dockerfile 
+#docker run elt-okta
