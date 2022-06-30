@@ -11,4 +11,4 @@ variables:
   - name: environment
     value: 'prd'
   - name: containerRegistry
-    value: 'acr-prd-bagel'
+    value: 'crprdtmxncbagel'

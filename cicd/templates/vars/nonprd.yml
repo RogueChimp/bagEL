@@ -11,4 +11,4 @@ variables:
   - name: environment
     value: 'nonprd'
   - name: containerRegistry
-    value: 'acr-np-bagel'
+    value: 'crnptmxncbagel'

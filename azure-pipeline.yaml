@@ -1,11 +1,13 @@
 name: $(BuildDefinitionName)_$(date:yyyyMMdd)$(rev:.r)
-#frustration
 
 trigger:
   batch: true
   branches:
     include:
     - main
+  tags:
+    include:
+    - v*
 
 variables:
   - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
@@ -20,7 +22,7 @@ variables:
     - group: np-variables
     - name: env
       value: nonprd
-  - ${{ elseif contains(variables['Build.SourceBranch'], "refs/tags") }}:
+  - ${{ elseif contains(variables['Build.SourceBranch'], 'refs/tags') }}:
     - template: cicd/templates/vars/prd.yml
     - group: prd-secrets
     - group: prd-variables
@@ -47,23 +49,23 @@ steps:
       environment: ${{ variables.environment }}
       terraform_version: ${{ variables.terraform_version }}
 
-        #  - template: cicd/templates/docker.yaml
-        #    parameters:
-        #      repository: ${{ variables.repository }}
-        #      dockerfile: ${{ variables.dockerfile }}
-        #      containerRegistry: ${{ variables.containerRegistry }}
-        #      command: 'push'
-        #      container_sources: 
-        #        - okta
-          #        - looker
+  - template: cicd/templates/docker.yaml
+    parameters:
+      repository: ${{ variables.repository }}
+      dockerfile: ${{ variables.dockerfile }}
+      containerRegistry: ${{ variables.containerRegistry }}
+      command: 'push'
+      container_sources: 
+        - okta
+        - looker
 
-        #  - template: cicd/templates/terraform-apply.yaml
-        #    parameters:
-        #       backendServiceArm: '${{ variables.backendServiceArm }}'
-        #       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
-        #       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
-        #       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
-        #       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
-        #       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
-        #       environment: ${{ variables.environment }}
-        #       terraform_version: ${{ variables.terraform_version }}
+  - template: cicd/templates/terraform-apply.yaml
+    parameters:
+       backendServiceArm: '${{ variables.backendServiceArm }}'
+       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
+       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
+       environment: ${{ variables.environment }}
+       terraform_version: ${{ variables.terraform_version }}
