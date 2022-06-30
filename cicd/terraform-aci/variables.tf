@@ -42,6 +42,10 @@ variable "storage_account_endpoint" {
   description = "Build ID of Azure DevOps Pipeline"
 }
 
+variable "storage_account_connection_string" {
+  type        = string
+  description = "Build ID of Azure DevOps Pipeline"
+}
 variable "okta_secret" {
   type        = string
   description = "Build ID of Azure DevOps Pipeline"
@@ -66,3 +70,5 @@ variable "looker_client_secret" {
   type        = string
   description = "Build ID of Azure DevOps Pipeline"
 }
+
+

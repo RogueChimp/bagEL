@@ -17,6 +17,7 @@ resource "azurerm_container_group" "okta_cg" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   os_type             = "Linux"
+  restart_policy      = "Never"
 
   image_registry_credential {
     username = data.azurerm_container_registry.acr.admin_username
@@ -39,6 +40,7 @@ resource "azurerm_container_group" "okta_cg" {
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
       OKTA_SECRET = var.okta_secret
     }
 
@@ -55,6 +57,7 @@ resource "azurerm_container_group" "looker_cg" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   os_type             = "Linux"
+  restart_policy      = "Never"
 
   image_registry_credential {
     username = data.azurerm_container_registry.acr.admin_username
@@ -78,6 +81,7 @@ resource "azurerm_container_group" "looker_cg" {
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
       LOOKER_CLIENT_SECRET = var.looker_client_secret
     }
 

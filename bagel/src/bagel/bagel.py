@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 import traceback
@@ -47,6 +47,11 @@ class Bagel:
                 logger.removeHandler(logger.handlers[0])
 
         fh_formatter = '{"timestamp":"%(asctime)s", "level_name":"%(levelname)s", "function_name":"%(funcName)s", "line_number":"%(lineno)d", "message":"%(message)s"}'
+        
+        log_dir = os.path.dirname(log_name)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        
         fh = logging.FileHandler(log_name)
         fh.setLevel(logging.INFO)
         fh.setFormatter(logging.Formatter(fmt=fh_formatter))
@@ -62,6 +67,8 @@ class Bagel:
         logger.addHandler(ch)
 
     def _load_config(self) -> None:
+
+        logger.info("Loading environment variables...")
 
         self.azure_storage_account = os.getenv("STORAGE_ACCOUNT")
         self.azure_storage_account_key = os.getenv("STORAGE_ACCOUNT_KEY")
@@ -80,10 +87,12 @@ class Bagel:
             self.azure_container,
             self.azure_table,
         ]:
+            logger.error("Environment variables must be properly loaded.")
             raise ValueError("Environment variables must be properly loaded.")
 
     def get_table_list(self) -> List[dict]:
-        path = os.path.join("sources", self.integration.name, "tables.yaml")
+        #path = os.path.join("sources", self.integration.name, "tables.yaml")
+        path = os.path.join("source_dir", "tables.yaml")
         with open(path, "r") as f:
             y = yaml.safe_load(f)
         tables = dict(y.items())["tables"]
@@ -226,7 +235,7 @@ class Bagel:
             timestamp = str(entity["last_updated_timestamp"])
             final_timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
         except:
-            timestamp = datetime(2022, 1, 1, 0, 0, 0, 0)
+            timestamp = datetime.now()  - timedelta(days=3)
             self.write_run_timestamp(table_client, system, table, timestamp)
             final_timestamp = timestamp
         return final_timestamp
