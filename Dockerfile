@@ -9,12 +9,6 @@ COPY bagel bagel
 
 SHELL ["bash","-c"]
 
-# RUN python -m venv venv && \
-#    source venv/bin/activate && \
-#    pip install -r bagel/requirements.txt && \
-#    pip install -e ./bagel && \
-#    pip install -r source_dir/requirements.txt 
-
 RUN pip install -r bagel/requirements.txt
 RUN pip install -e ./bagel
 RUN pip install -r source_dir/requirements.txt 

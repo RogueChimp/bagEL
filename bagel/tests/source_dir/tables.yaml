@@ -1,0 +1,5 @@
+tables:
+- name: My Table 0
+  elt_type: elt
+- name: my_table_1
+  elt_type: full

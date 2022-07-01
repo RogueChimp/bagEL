@@ -1,6 +1,5 @@
 import pytest
 import unittest
-from unittest import mock
 
 from src.bagel.integration import BagelIntegration
 
@@ -12,10 +11,10 @@ class TestBagelIntegration(unittest.TestCase):
     def test_when_bagel_integration_instatiated_without_get_data_then_should_raise_type_error(
         self
     ):
-        with pytest.raises(TypeError) as e:
+        with pytest.raises(TypeError):
             class TestIntegration(BagelIntegration):
                 pass
-            test_integration = TestIntegration()
+            TestIntegration()
 
 
     @pytest.mark.unit_test
@@ -26,6 +25,7 @@ class TestBagelIntegration(unittest.TestCase):
             def get_data(self):
                 return None
         try:
-            test_integration = TestIntegration()
+            t = TestIntegration()
+            t.get_data()
         except:
             pytest.fail("Raised Exception to get data despite instantiation")
