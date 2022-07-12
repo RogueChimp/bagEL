@@ -1,54 +1,68 @@
-import os
-import src.bagel as bagel
+import logging
 
-SYSTEM = '[source_name]'
-AUTH_SECRET = 'env_secret'
-BASE_URL = 'https://trimedxext.source_name.com/api/v1/'
-#TABLE_FILE = "C:\\repos\\python-elt\\sources\\okta\\tables.yaml"
-TABLE_FILE = os.path.join("sources",SYSTEM,"tables.yaml")
+from bagel import Bagel, BagelIntegration
 
 
-def main():
+logging.basicConfig(
+    level=logging.WARNING,
+    format='{"timestamp":"%(asctime)s", "level_name":"%(levelname)s", "function_name":"%(funcName)s", "line_number":"%(lineno)d", "message":"%(message)s"}',
+)
 
-  #get list of tables
-  tables = bagel.get_tables(TABLE_FILE)
-  counter = 0
-  for t in tables:
-    running_log = {}
-    table = t["name"]
-    elt_type = t["elt_type"]
-    running_log["table_name"] = table
-    running_log["elt_type"] = elt_type
-    
-    #get current timestamp
-    current_timestamp = bagel.get_current_timestamp()
-    running_log["current_timestamp"] = current_timestamp
 
-    #get last run timestamp
-    table_client = bagel.connect_azure_table()
-    last_run_timestamp = bagel.get_last_run_timestamp(table_client, SYSTEM, table)
-    running_log["last_run_timestamp"] = last_run_timestamp
+class Template(BagelIntegration):
 
-    #get data
-    data = 'some function above in any format'
+    name = "template" # name of source system
 
-    #generate file_name
-    file_name = bagel.format_json_blob_name(SYSTEM, table)
-    running_log["file"] = file_name
+    def __init__(self) -> None:
+        self.is_generator = True # for example purposes only
 
-    #upload blob 
-    container_client = bagel.connect_azure_blob()
-    bagel.write_json_to_blob(container_client, file_name, bytes(str(data),'utf-8'))
-    counter+=1
-    #overwrite last run timestamp
-    entity = bagel.write_run_timestamp(table_client, SYSTEM, table, current_timestamp)
-    running_log["azure_table_new_entity"] = entity 
-    running_log["files_created"] = counter 
+    def get_data(
+        self,
+        table: str,
+        **kwargs
+    ):
+        """`get_data()` is how you extract data from the source system
 
-    #upload log
-    log_file_name = bagel.format_json_blob_name(SYSTEM, table, True)
-    bagel.write_json_to_blob(container_client, log_file_name, bytes(str(running_log),'utf-8'))
-    print(running_log)
+        `PEP 484`_ type annotations are supported. If attribute, parameter, and
+        return types are annotated according to `PEP 484`_, they do not need to be
+        included in the docstring:
+
+        Args:
+            table (str): The name of the "table" that is being uploaded.
+            **kwargs:
+                last_run_timestamp (datetime.datetime): Last time the table has been run. Optional.
+                current_timestamp (datetime.datetime): Current timestamp for timeboxing. Optional.
+                elt_type (str): Type of elt. Optional.
+
+        Returns:
+            generator or list: A generator yielding lists of data dictionaries, or a list of data dictionaries
+
+        """
+        if self.is_generator:
+
+            data = [
+                [{"a": 0}],
+                [{"b": 1}],
+                [{"c": 2}],
+            ]
+
+            for d in data:
+                yield d
+
+            return None
+
+        else:
+            data = [
+                {"a": 0},
+                {"b": 1},
+                {"c": 2},
+            ]
+
+            return data
+
 
 if __name__ == "__main__":
-  main()    
+
+    bagel = Bagel(Template())
+
+    bagel.run()
