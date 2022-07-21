@@ -30,6 +30,16 @@ variables:
       value: prd
 
 steps:
+  - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
+    - script: |
+        #grab everything after the last '/'
+        TARGET_BRANCH=$(grep -E -o '[^/]+$' <<<$TARGET_BRANCH)
+
+        docker run -v $(pwd):/src --workdir /src returntocorp/semgrep-agent:v1 semgrep-agent --config=p/secrets --disable-metrics --baseline-ref $(cat .git/refs/remotes/origin/$TARGET_BRANCH)
+      displayName: 'semgrep scan'
+      env:
+        TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+  
   - task: qetza.replacetokens.replacetokens-task.replacetokens@3
     displayName: 'Replace Tokens'
     inputs:
