@@ -25,13 +25,11 @@ class Okta(BagelIntegration):
     def _load_config(self):
         self._auth_secret = os.getenv("OKTA_SECRET")
 
-    def get_data(
-        self,
-        table: str,
-        **kwargs
-    ):
+    def get_data(self, table: str, **kwargs):
 
-        self.next_url = self.okta_get_url(table, kwargs["last_run_timestamp"], kwargs["current_timestamp"])
+        self.next_url = self.okta_get_url(
+            table, kwargs["last_run_timestamp"], kwargs["current_timestamp"]
+        )
         rate_limit = -1
         while self.next_url:
             data_log_details = {}

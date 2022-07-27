@@ -3,27 +3,30 @@ import unittest
 
 from src.bagel.integration import BagelIntegration
 
+
 class TestBagelIntegration(unittest.TestCase):
     def setUp(self):
         pass
 
     @pytest.mark.unit_test
     def test_when_bagel_integration_instatiated_without_get_data_then_should_raise_type_error(
-        self
+        self,
     ):
         with pytest.raises(TypeError):
+
             class TestIntegration(BagelIntegration):
                 pass
-            TestIntegration()
 
+            TestIntegration()
 
     @pytest.mark.unit_test
     def test_when_bagel_integration_instantiated_with_get_data_call_then_should_pass(
-        self
+        self,
     ):
         class TestIntegration(BagelIntegration):
             def get_data(self):
                 return None
+
         try:
             t = TestIntegration()
             t.get_data()

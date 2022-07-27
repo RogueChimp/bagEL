@@ -6,7 +6,12 @@ import pytest
 import unittest
 from unittest import mock
 
-from src.bagel.bagel import Bagel, BagelError, format_json_blob_name, format_dict_to_json_binary
+from src.bagel.bagel import (
+    Bagel,
+    BagelError,
+    format_json_blob_name,
+    format_dict_to_json_binary,
+)
 from src.bagel.integration import BagelIntegration
 
 
@@ -140,7 +145,7 @@ class TestBagel(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             bagel._validate_data(improper_list_format)
-        
+
         # test generators
         def get_data_proper_generator():
 
@@ -153,7 +158,6 @@ class TestBagel(unittest.TestCase):
 
         data = bagel._validate_data(get_data_proper_generator())
         assert list(data) == expected
-
 
         def get_data_improper_generator():
 
@@ -169,19 +173,16 @@ class TestBagel(unittest.TestCase):
             bagel._process_data(data)
 
     @pytest.mark.unit_test
-    def test_when_sending_to_blob_then_it_sends_as_json(
-        self
-    ):
+    def test_when_sending_to_blob_then_it_sends_as_json(self):
 
         input_ = [
-            {'foo': 'bar'},
-            {'baz': 'qux'},
-            {'None': None},
+            {"foo": "bar"},
+            {"baz": "qux"},
+            {"None": None},
         ]
 
         expected = bytes(
-            """[{"foo": "bar"}, {"baz": "qux"}, {"None": null}]""",
-            "utf-8"
+            """[{"foo": "bar"}, {"baz": "qux"}, {"None": null}]""", "utf-8"
         )
 
         results = format_dict_to_json_binary(input_)

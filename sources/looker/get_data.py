@@ -16,16 +16,11 @@ class Looker(BagelIntegration):
         self._client_id = os.getenv("LOOKER_CLIENT_ID")
         self._client_secret = os.getenv("LOOKER_CLIENT_SECRET")
 
-    def get_data(
-        self,
-        table: str,
-        **kwargs
-    ):
+    def get_data(self, table: str, **kwargs):
         headers = self.looker_login(self._client_id, self._client_secret)
         look_id = self.looker_get_look_id(headers, table)
         data = self.looker_get_data(headers, look_id, kwargs["elt_type"])
         return data
-
 
     def looker_login(self, client_id, client_secret):
         params = {"client_id": client_id, "client_secret": client_secret}
@@ -39,7 +34,6 @@ class Looker(BagelIntegration):
         }
         return headers
 
-
     def looker_get_look_id(self, headers, title):
         look_url = f"{self.base_url}looks/search"
         params = {"title": title}
@@ -48,7 +42,6 @@ class Looker(BagelIntegration):
         for item in data:
             look_id = item["id"]
         return look_id
-
 
     def looker_get_data(self, headers, look_id, elt_type, timestamp=None):
         if elt_type == "full":
@@ -64,7 +57,7 @@ class Looker(BagelIntegration):
 
 
 if __name__ == "__main__":
-    
+
     bagel = Bagel(Looker())
 
     bagel.run()

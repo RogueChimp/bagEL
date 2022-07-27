@@ -9,18 +9,21 @@ logging.basicConfig(
 )
 
 
+def utility_function():
+    return "foo"
+
+
 class Template(BagelIntegration):
 
-    name = "template" # name of source system
+    name = "template"  # name of source system
 
     def __init__(self) -> None:
-        self.is_generator = True # for example purposes only
+        self.is_generator = True  # for example purposes only
 
-    def get_data(
-        self,
-        table: str,
-        **kwargs
-    ):
+    def _helper_function(self):
+        return self.is_generator
+
+    def get_data(self, table: str, **kwargs):
         """`get_data()` is how you extract data from the source system
 
         `PEP 484`_ type annotations are supported. If attribute, parameter, and

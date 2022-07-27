@@ -39,6 +39,26 @@ steps:
       displayName: 'semgrep scan'
       env:
         TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.8'
+      inputs:
+        versionSpec: 3.8
+
+    - script: pip install black && black . --check
+
+    - script: pip install pytest pytest-cov black
+      displayName: Install pytest
+
+    - task: Bash@3
+      inputs:
+        filePath: pip-install-all-requirements.sh
+      displayName: Install dependencies
+
+    - task: Bash@3
+      inputs:
+        filePath: run-tests.sh
+      displayName: pytest
   
   - task: qetza.replacetokens.replacetokens-task.replacetokens@3
     displayName: 'Replace Tokens'
