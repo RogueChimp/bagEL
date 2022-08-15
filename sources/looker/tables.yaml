@@ -1,5 +1,17 @@
 tables:
-  - name: Dashboard Query Performance
-    elt_type: full
-  - name: Monitoring_Users
-    elt_type: full
+  - name: history_dashboard
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D
+  - name: history_history
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D
+  - name: history_query
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D
+  - name: history_user
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D

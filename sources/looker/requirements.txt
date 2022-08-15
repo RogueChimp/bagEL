@@ -1,1 +1,6 @@
 requests
+datetime
+pytest
+pytest-cov
+pytest-html
+pytest-metadata

@@ -125,7 +125,7 @@ class Bagel:
         return tables
 
     def _get_table_path(self):
-        dir_path = os.path.join("source_dir")
+        dir_path = os.path.split(traceback.extract_stack()[0].filename)[0]
 
         return (
             os.path.join(dir_path, "tables.yaml")
@@ -232,6 +232,9 @@ class Bagel:
             raise TypeError("get_data must provide list or generator object")
 
         if isinstance(data, list):
+            if len(data) == 0:
+                return data
+
             if isinstance(data[0], list):
                 raise TypeError("Cannot be list of lists. Use pagination/generator.")
             data = [data]

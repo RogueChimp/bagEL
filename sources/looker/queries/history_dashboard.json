@@ -1,0 +1,24 @@
+{
+  "model": "system__activity",
+  "view": "history",
+  "fields": [
+    "dashboard.title",
+    "dashboard.id",
+    "dashboard.description",
+    "dashboard.link",
+    "dashboard.is_legacy",
+    "dashboard.lookml_link_id",
+    "dashboard.moved_to_trash",
+    "dashboard.deleted_time",
+    "dashboard.refresh_interval_ordered",
+    "dashboard.run_on_load",
+    "dashboard.created_time",
+    "history.id"
+  ],
+  "filters": {
+    "dashboard.created_time": "$(FROM) to $(TO)"
+  },
+  "sorts": [
+    "history.most_recent_query_date desc"
+  ]
+}

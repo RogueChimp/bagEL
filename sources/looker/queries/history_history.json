@@ -1,0 +1,40 @@
+{
+  "model": "system__activity",
+  "view": "history",
+  "fields": [
+    "history.id",
+    "history.created_time",
+    "history.cache",
+    "history.cache_key",
+    "history.result_source",
+    "history.completed_time",
+    "history.dialect",
+    "history.connection_name",
+    "history.connection_id",
+    "history.real_dash_id",
+    "history.dashboard_session",
+    "history.message",
+    "history.most_recent_run_at_time",
+    "history.most_recent_length",
+    "history.is_single_query",
+    "history.is_user_dashboard",
+    "history.rebuild_pdts",
+    "history.render_key",
+    "history.result_format",
+    "history.runtime",
+    "history.runtime_tiers_5",
+    "history.runtime_tiers",
+    "history.slug",
+    "source_query_rank.sorted_source",
+    "history.source",
+    "history.issuer_source",
+    "history.status",
+    "history.workspace_id"
+  ],
+  "filters": {
+    "history.created_time": "$(FROM) to $(TO)"
+  },
+  "sorts": [
+    "history.most_recent_query_date desc"
+  ]
+}

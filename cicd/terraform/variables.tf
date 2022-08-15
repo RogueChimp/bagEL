@@ -19,40 +19,40 @@ variable "build_id" {
 
 variable "azure_container" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Name of container to be pushed to in Azure"
 }
 
 variable "azure_table" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Name of table to be pushed to in Azure"
 }
 
 variable "storage_account" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Azure Storage Account"
 }
 
 variable "storage_account_name" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Name of Azure Storage Account"
 }
 
 variable "storage_account_endpoint" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Azure storage account endpoint / connection string"
 }
 
 variable "okta_secret" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Okta authentication token"
 }
 
 variable "looker_client_id" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Looker authentication client id"
 }
 
 variable "looker_client_secret" {
   type        = string
-  description = "Build ID of Azure DevOps Pipeline"
+  description = "Looker authentication client secret "
 }

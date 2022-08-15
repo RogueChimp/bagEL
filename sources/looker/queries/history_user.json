@@ -1,0 +1,24 @@
+{
+  "model": "system__activity",
+  "view": "history",
+  "fields": [
+    "history.id",
+    "user.created_time",
+    "user.dev_branch_name",
+    "user.edit_link",
+    "user.email",
+    "role.has_role",
+    "user.home_space_id",
+    "user.id",
+    "user.is_disabled",
+    "user.name",
+    "user_query_rank.user_name",
+    "user.timezone"
+  ],
+  "filters": {
+    "user.created_time": "$(FROM) to $(TO)"
+  },
+  "sorts": [
+    "history.most_recent_query_date desc"
+  ]
+}

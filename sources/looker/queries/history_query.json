@@ -1,0 +1,33 @@
+{
+  "model": "system__activity",
+  "view": "history",
+  "fields": [
+    "history.id",
+    "query.created_time",
+    "query.view",
+    "query.dynamic_fields",
+    "query.formatted_fields",
+    "query.fill_fields",
+    "query.filters",
+    "query.formatted_pivots",
+    "query.hash",
+    "query.id",
+    "query.link",
+    "query.model",
+    "query.query_timezone",
+    "query.visible_ui_sections",
+    "query.vis_config",
+    "query.sorts",
+    "query.row_totals",
+    "query.row_total",
+    "query.limit",
+    "query.total",
+    "query.column_limit"
+  ],
+  "filters": {
+    "query.created_time": "$(FROM) to $(TO)"
+  },
+  "sorts": [
+    "history.most_recent_query_date desc"
+  ]
+}

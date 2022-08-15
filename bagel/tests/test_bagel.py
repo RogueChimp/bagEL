@@ -173,6 +173,25 @@ class TestBagel(unittest.TestCase):
             bagel._process_data(data)
 
     @pytest.mark.unit_test
+    @mock.patch("src.bagel.bagel.Bagel.write_json_to_blob")
+    @mock.patch("src.bagel.bagel.format_json_blob_name")
+    @mock.patch("src.bagel.bagel.os.getenv")
+    def test_when_data_is_empty_list_should_return_an_empty_array_and_pass_through(
+        self, mock_getenv, mock_format_json_blob_name, mock_write_json_to_blob
+    ):
+
+        mock_getenv.return_value = "asdf"
+        mock_format_json_blob_name.return_value = "asdf"
+
+        # test list format
+        bagel = Bagel(self.test_integration)
+        results = bagel._validate_data([])
+
+        assert results == []
+
+        assert bagel._process_data("fake_table_name", []) == (0, [])
+
+    @pytest.mark.unit_test
     def test_when_sending_to_blob_then_it_sends_as_json(self):
 
         input_ = [
