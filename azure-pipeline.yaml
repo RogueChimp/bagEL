@@ -9,6 +9,13 @@ trigger:
     include:
     - v*
 
+resources:
+  repositories:
+    - repository: core
+      type: git 
+      name: devops/pipeline_core
+      ref: refs/heads/main
+
 variables:
   - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
     - template: cicd/templates/vars/sbx.yml
@@ -31,14 +38,10 @@ variables:
 
 steps:
   - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
-    - script: |
-        #grab everything after the last '/'
-        TARGET_BRANCH=$(grep -E -o '[^/]+$' <<<$TARGET_BRANCH)
-
-        docker run -v $(pwd):/src --workdir /src returntocorp/semgrep-agent:v1 semgrep-agent --config=p/secrets --disable-metrics --baseline-ref $(cat .git/refs/remotes/origin/$TARGET_BRANCH)
-      displayName: 'semgrep scan'
-      env:
-        TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+    - template: code_scan.yml@core
+      parameters:
+        repoType: ado
+        serviceCxn: devops-TMXSBX-Integrations
 
     - task: UsePythonVersion@0
       displayName: 'Use Python 3.8'
