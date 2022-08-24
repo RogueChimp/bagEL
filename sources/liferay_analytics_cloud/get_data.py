@@ -1,0 +1,79 @@
+import os
+import requests
+import logging
+import time
+import json
+from bagel import Bagel, BagelIntegration
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='{"timestamp":"%(asctime)s", "level_name":"%(levelname)s", "function_name":"%(funcName)s", "line_number":"%(lineno)d", "message":"%(message)s"}',
+)
+
+
+class LiferayAnalyticsCloud(BagelIntegration):
+
+    name = "liferay_analytics_cloud"
+
+    def __init__(self) -> None:
+        self._load_config()
+        self.base_url = "http://analytics.liferay.com/api/reports/export/"
+
+    def _load_config(self):
+        self.__auth_secret = os.getenv("LIFERAY_ANALYTICS_CLOUD_TOKEN")
+
+    def get_data(self, table: str, **kwargs):
+        self.url = self.liferay_analytics_cloud_get_url(
+            table, kwargs["last_run_timestamp"], kwargs["current_timestamp"]
+        )
+        self.file_status = "PENDING"
+        data = self.liferay_analytics_cloud_get_data(self.file_status, self.url)
+        return data
+
+    def liferay_analytics_cloud_get_url(
+        self, table, last_run_timestamp, current_timestamp
+    ):
+        last_run_timestamp = (
+            last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        )
+        current_timestamp = (
+            current_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        )
+        since = f"fromDate={last_run_timestamp}"
+        until = f"toDate={current_timestamp}"
+        url = f"{self.base_url}{table}?{since}&{until}"
+        # url = "http://analytics.liferay.com/api/reports/export/individual?fromDate=2022-08-15T00:45:03.446Z&toDate=2022-08-16T00:45:03.446Z"
+        return url
+
+    def liferay_analytics_cloud_get_data(self, file_status, url):
+        logging.info(f"url: {url}")
+        query = {
+            "Authorization": f"Bearer {self.__auth_secret}",
+        }
+        while file_status == "PENDING":
+            data = []
+            logging.info(f"...looking for file")
+            response = requests.get(url, headers=query)
+            data_text = response.text
+            status = response.status_code
+            if status != 200:
+                logging.error(f"...API Error {status}")
+                raise ValueError(f"API error.{status}...{url}")
+            split_text = data_text.split("\n")
+            for item in split_text:
+                if item:
+                    j = json.loads(item)
+                    data.append(j)
+            logging.debug(f"...data: {data}")
+            if any("status" in d for d in data):
+                print("..." + data[0]["status"])
+                time.sleep(30)
+            else:
+                file_status = "COMPLETE"
+        return data
+
+
+if __name__ == "__main__":
+    bagel = Bagel(LiferayAnalyticsCloud())
+
+    bagel.run()

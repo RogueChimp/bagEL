@@ -1,0 +1,10 @@
+tables:
+  - name: page
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D
+
+  # - name: individual
+  #   elt_type: delta
+  #   historical_batch: true
+  #   historical_frequency: 1D

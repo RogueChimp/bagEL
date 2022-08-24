@@ -46,7 +46,8 @@ steps:
         versionSpec: 3.8
 
     - script: pip install black && black . --check
-
+      displayName: Black formatting/linting
+      
     - script: pip install pytest pytest-cov black
       displayName: Install pytest
 

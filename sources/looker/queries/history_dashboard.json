@@ -16,7 +16,7 @@
     "history.id"
   ],
   "filters": {
-    "dashboard.created_time": "$(FROM) to $(TO)"
+    "history.created_time": "$(FROM) to $(TO)"
   },
   "sorts": [
     "history.most_recent_query_date desc"

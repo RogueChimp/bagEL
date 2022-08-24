@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -11,6 +11,8 @@ from src.bagel.bagel import (
     BagelError,
     format_json_blob_name,
     format_dict_to_json_binary,
+    extract_date_ranges,
+    get_historical_batch_ranges,
 )
 from src.bagel.integration import BagelIntegration
 
@@ -104,12 +106,18 @@ class TestBagel(unittest.TestCase):
         expected = [
             {"name": "My Table 0", "elt_type": "elt"},
             {"name": "my_table_1", "elt_type": "full"},
+            {
+                "name": "my_table_2",
+                "elt_type": "delta",
+                "historical_batch": True,
+                "historical_frequency": "D",
+            },
         ]
 
         bagel = Bagel(self.test_integration)
         results = bagel.get_table_list()
 
-        assert len(results) == 2
+        assert len(results) == 3
         assert results == expected
 
     @pytest.mark.unit_test
@@ -180,20 +188,6 @@ class TestBagel(unittest.TestCase):
         self, mock_getenv, mock_format_json_blob_name, mock_write_json_to_blob
     ):
 
-        mock_getenv.return_value = "asdf"
-        mock_format_json_blob_name.return_value = "asdf"
-
-        # test list format
-        bagel = Bagel(self.test_integration)
-        results = bagel._validate_data([])
-
-        assert results == []
-
-        assert bagel._process_data("fake_table_name", []) == (0, [])
-
-    @pytest.mark.unit_test
-    def test_when_sending_to_blob_then_it_sends_as_json(self):
-
         input_ = [
             {"foo": "bar"},
             {"baz": "qux"},
@@ -209,3 +203,90 @@ class TestBagel(unittest.TestCase):
         assert results == expected
 
         assert json.loads(results) == input_
+
+    @pytest.mark.unit_test
+    def test_when_historical_batch_default_day_then_it_splits_the_ranges(self):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 7, 1, 1, 1, 548513)
+        expected = 7
+        date_ranges = get_historical_batch_ranges(start_time, end_time)
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[-1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_historical_batch_by_hour_then_it_splits_the_ranges(self):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 1, 7, 1, 1, 548513)
+        expected = 7
+        date_ranges = get_historical_batch_ranges(start_time, end_time, "H")
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[-1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_historical_batch_single_day_then_it_does_not_split_the_ranges(self):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 2, 1, 1, 1, 548513)
+        expected = 2
+        date_ranges = get_historical_batch_ranges(start_time, end_time)
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_not_historical_batch_single_day_then_it_does_not_split_the_ranges(
+        self,
+    ):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 7, 1, 1, 1, 548513)
+        expected = 2
+        date_ranges = extract_date_ranges(start_time, end_time, False, None)
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_delta_type_is_none_single_day_then_it_does_not_split_the_ranges(
+        self,
+    ):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 7, 1, 1, 1, 548513)
+        expected = 2
+        date_ranges = extract_date_ranges(start_time, end_time, None, None)
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_historical_load_D_true_then_it_does_split_the_ranges(
+        self,
+    ):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 7, 1, 1, 1, 548513)
+        expected = 7
+        date_ranges = extract_date_ranges(start_time, end_time, True, None)
+        result = len(date_ranges)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[-1] == end_time
+
+    @pytest.mark.unit_test
+    def test_when_historical_load_H_true_then_it_does_split_the_ranges(
+        self,
+    ):
+        start_time = datetime(2022, 1, 1, 1, 1, 1, 548513)
+        end_time = datetime(2022, 1, 1, 7, 1, 1, 548513)
+        expected = 7
+        date_ranges = extract_date_ranges(start_time, end_time, True, "H")
+        result = len(date_ranges)
+        delta = timedelta(hours=1)
+        assert result == expected
+        assert date_ranges[0] == start_time
+        assert date_ranges[-1] == end_time
+        assert date_ranges[1] == start_time + delta

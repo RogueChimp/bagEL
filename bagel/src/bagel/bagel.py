@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+import traceback
 import json
 import logging
 import os
 import traceback
+import pandas as pd
 import types
 from typing import List
 from azure.data.tables import TableServiceClient, UpdateMode
@@ -42,6 +44,24 @@ def format_time(timestamp):
 
 def format_dict_to_json_binary(d):
     return bytes(json.dumps(d, default=str), "utf-8")
+
+
+def extract_date_ranges(
+    last_run_timestamp, current_timestamp, historical_batch, historical_frequency
+):
+    if historical_batch:
+        date_ranges = get_historical_batch_ranges(
+            last_run_timestamp, current_timestamp, historical_frequency
+        )
+    elif not historical_batch:
+        date_ranges = [last_run_timestamp, current_timestamp]
+    return date_ranges
+
+
+def get_historical_batch_ranges(start, end, freq=None):
+    if not freq:
+        freq = "D"
+    return pd.date_range(start=start, end=end, freq=freq)
 
 
 # TODO loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
@@ -143,9 +163,13 @@ class Bagel:
 
             table_name = format_table_name(t["name"])
             elt_type = t["elt_type"]
+            historical_batch = t.get("historical_batch", False)
+            historical_frequency = t.get("historical_frequency", None)
 
             try:
-                self._run_table(table_name, elt_type)
+                self._run_table(
+                    table_name, elt_type, historical_batch, historical_frequency
+                )
 
             except Exception as e:
                 errors.append(traceback.format_exc())
@@ -155,7 +179,7 @@ class Bagel:
         if errors:
             raise BagelError(errors)
 
-    def _run_table(self, table_name, elt_type):
+    def _run_table(self, table_name, elt_type, historical_batch, historical_frequency):
 
         log_file_name = os.path.join(
             "logs",
@@ -167,6 +191,8 @@ class Bagel:
         self._refresh_file_handler(log_file_name)
         logger.info(f"table_name: {table_name}")
         logger.info(f"elt_type: {elt_type}")
+        logger.info(f"historical_batch: {historical_batch}")
+        logger.info(f"historical_frequency: {historical_frequency}")
 
         last_run_timestamp, current_timestamp = self.get_timebox(
             table_client, table_name
@@ -175,19 +201,27 @@ class Bagel:
         logger.info(f"Current Timestamp: {current_timestamp}")
         logger.info(f"Last Run Timestamp: {last_run_timestamp}")
 
-        integration_data = self.integration.get_data(
-            table_name,
-            last_run_timestamp=last_run_timestamp,
-            current_timestamp=current_timestamp,
-            elt_type=elt_type,
+        date_ranges = extract_date_ranges(
+            last_run_timestamp,
+            current_timestamp,
+            historical_batch,
+            historical_frequency,
         )
+        counter = 0
+        for i in range(len(date_ranges) - 1):
+            integration_data = self.integration.get_data(
+                table_name,
+                elt_type=elt_type,
+                last_run_timestamp=date_ranges[i],
+                current_timestamp=date_ranges[i + 1],
+            )
 
-        data = self._validate_data(integration_data)
+            data = self._validate_data(integration_data)
 
-        # get data
-        counter, data_log = self._process_data(table_name, data)
+            # get data
+            counter, data_log = self._process_data(table_name, data)
 
-        logger.info(f"Files: {data_log}")
+            logger.info(f"Files: {data_log}")
 
         # overwrite last run timestamp
         entity = self.write_run_timestamp(

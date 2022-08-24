@@ -2,8 +2,13 @@ import os
 import requests
 import json
 import datetime
-
+import logging
 from bagel import Bagel, BagelIntegration
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='{"timestamp":"%(asctime)s", "level_name":"%(levelname)s", "function_name":"%(funcName)s", "line_number":"%(lineno)d", "message":"%(message)s"}',
+)
 
 
 class Looker(BagelIntegration):
@@ -58,6 +63,7 @@ class Looker(BagelIntegration):
             "authorization": "Bearer " + data["access_token"],
             "cache-control": "no-cache",
         }
+        logging.info(f"got auth headers...")
         return headers
 
     def looker_get_data(
@@ -70,6 +76,8 @@ class Looker(BagelIntegration):
     ):
         query_url = f"{self.base_url}/queries/run/json"
         data_payload = self.get_data_payload(table)
+        logging.info(f"table: {table}")
+        logging.info(f"elt_type: {elt_type}")
 
         if elt_type == "full":
             data_payload["filters"] = None
@@ -87,6 +95,8 @@ class Looker(BagelIntegration):
 
         else:
             raise Exception("Invalid elt_type in tables.yaml file")
+
+        logging.info(f"data_payload: {data_payload}")
 
         response = requests.post(url=query_url, json=data_payload, headers=headers)
         data = response.json()

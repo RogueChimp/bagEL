@@ -3,3 +3,6 @@ azure-data-tables
 azure-core
 azure-storage-blob
 pyyaml
+pytest
+pytest-cov
+pandas

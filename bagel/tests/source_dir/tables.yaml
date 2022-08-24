@@ -3,3 +3,7 @@ tables:
   elt_type: elt
 - name: my_table_1
   elt_type: full
+- name: my_table_2
+  elt_type: delta
+  historical_batch: true
+  historical_frequency: D

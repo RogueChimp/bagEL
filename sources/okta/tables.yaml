@@ -1,3 +1,4 @@
 tables:
   - name: logs
     elt_type: delta
+    historical_batch: false

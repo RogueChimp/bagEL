@@ -1,0 +1,52 @@
+[
+    {
+        "country": "United States",
+        "bounce": 0,
+        "city": "Hayward",
+        "knownIndividual": true,
+        "contentLanguageId": "en-US",
+        "individualId": "521337660456108167",
+        "indirectAccess": 0,
+        "title": "Login - EMarketplace - Liferay DXP",
+        "formSubmissions": 0,
+        "experienceId": "DEFAULT",
+        "exits": 0,
+        "dataSourceId": "496477533305646861",
+        "searchTerm": null,
+        "lastEventDate": "2022-07-19T17:00:28.385Z",
+        "browserName": "Chrome",
+        "interactionDates": [
+            "2022-07-19T17:00:28.385Z"
+        ],
+        "experimentId": "",
+        "entrances": 0,
+        "id": "565702654916471207",
+        "variantId": "",
+        "platformName": "macOS",
+        "firstEventDate": "2022-07-19T17:00:28.385Z",
+        "views": 0,
+        "channelId": "496464074587299717",
+        "deviceType": "Desktop",
+        "canonicalUrl": "https://webserver-supportna-tng.lfr.cloud/web/emarketplace",
+        "pageScrolls": [],
+        "reads": 0,
+        "ctaClicks": 0,
+        "timeOnPage": 0,
+        "sessionId": null,
+        "userId": "66e93fdd-6fe9-4e69-aa46-3e38276b7279",
+        "url": "https://webserver-supportna-tng.lfr.cloud/web/emarketplace",
+        "indirectAccessDates": [],
+        "directAccessDates": [],
+        "segmentNames": [
+            "External Customers",
+            "Finance Persona Segment II",
+            "External User Login"
+        ],
+        "directAccess": 0,
+        "modifiedDate": "2022-07-19T17:00:42.362Z",
+        "asset": false,
+        "region": "California",
+        "eventDate": "2022-07-19T17:00:00.000Z",
+        "primaryKey": "eccbbc54d94aed23390b6559bb3faa5933a6bc18da626bfc09d0938d836f8af1"
+    }
+]
