@@ -17,9 +17,14 @@ class Looker(BagelIntegration):
 
     def __init__(self) -> None:
         self._load_config()
-        self.base_url = "https://lookerdev.trimedx.com:443/api/4.0"
 
     def _load_config(self):
+        self.__base_url = (
+            os.getenv("LOOKER_URL", "")
+            + ":"
+            + os.getenv("LOOKER_PORT", "")
+            + os.getenv("LOOKER_API_ENDPOINT", "")
+        )
         self.__client_id = os.getenv("LOOKER_CLIENT_ID")
         self.__client_secret = os.getenv("LOOKER_CLIENT_SECRET")
 
@@ -56,7 +61,7 @@ class Looker(BagelIntegration):
 
     def looker_login(self):
         params = {"client_id": self.__client_id, "client_secret": self.__client_secret}
-        login_url = f"{self.base_url}/login"
+        login_url = f"{self.__base_url}/login"
         response = requests.post(url=login_url, params=params)
         data = response.json()
         headers = {
@@ -74,7 +79,7 @@ class Looker(BagelIntegration):
         last_run_timestamp=None,
         current_timestamp=None,
     ):
-        query_url = f"{self.base_url}/queries/run/json"
+        query_url = f"{self.__base_url}/queries/run/json"
         data_payload = self.get_data_payload(table)
         logging.info(f"table: {table}")
         logging.info(f"elt_type: {elt_type}")

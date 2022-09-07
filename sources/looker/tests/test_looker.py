@@ -15,11 +15,23 @@ from looker.tests.fakes import mock_post_request
 class TestLooker(unittest.TestCase):
     @mock.patch("looker.get_data.os.getenv")
     def setUp(self, mock_os_getenv):
+        self.fake_url, self.fake_port, self.fake_endpoint = [
+            "https://FAKE/BASE/URL",
+            "1234",
+            "/FAKE/API/ENDPOINT/0.0",
+        ]
+        self.fake_base_url = self.fake_url + ":" + self.fake_port + self.fake_endpoint
         self.fake_client_id, self.fake_client_secret = [
             "FAKE_CLIENT_ID",
             "FAKE_CLIENT_SECRET",
         ]
-        mock_os_getenv.side_effect = [self.fake_client_id, self.fake_client_secret]
+        mock_os_getenv.side_effect = [
+            self.fake_url,
+            self.fake_port,
+            self.fake_endpoint,
+            self.fake_client_id,
+            self.fake_client_secret,
+        ]
         self.fake_table_name = f"THIS_TABLE_DOES_NOT_EXIST_{secrets.token_urlsafe(16)}"
         self.elt_type = {
             "full": "full",
@@ -47,16 +59,22 @@ class TestLooker(unittest.TestCase):
 
     @pytest.mark.unit_test
     @mock.patch("looker.get_data.os.getenv")
-    def test_when_class_instantiated_then_sets_proper_secret_variables_in_load_config_and_base_url(
+    def test_when_class_instantiated_then_sets_proper_secret_variables_in_load_config_and_properly_configures_base_url(
         self, mock_os_getenv
     ):
-        mock_os_getenv.side_effect = [self.fake_client_id, self.fake_client_secret]
+        mock_os_getenv.side_effect = [
+            self.fake_url,
+            self.fake_port,
+            self.fake_endpoint,
+            self.fake_client_id,
+            self.fake_client_secret,
+        ]
 
         test_looker = Looker()
 
         assert test_looker._Looker__client_id == self.fake_client_id
         assert test_looker._Looker__client_secret == self.fake_client_secret
-        assert test_looker.base_url == "https://lookerdev.trimedx.com:443/api/4.0"
+        assert test_looker._Looker__base_url == self.fake_base_url
 
     @pytest.mark.unit_test
     def test_when_format_to_looker_time_called_with_not_datetime_type_then_raises_exception(
@@ -130,7 +148,7 @@ class TestLooker(unittest.TestCase):
         headers = self.lk.looker_login()
 
         mock_requests_post.assert_called_with(
-            url=f"{self.lk.base_url}/login",
+            url=f"{self.lk._Looker__base_url}/login",
             params={
                 "client_id": self.lk._Looker__client_id,
                 "client_secret": self.lk._Looker__client_secret,
@@ -142,19 +160,21 @@ class TestLooker(unittest.TestCase):
     @pytest.mark.unit_test
     def test_when_login_with_invalid_url_then_should_raise_ConnectionError(self):
         test_looker = Looker()
-        test_looker.base_url = (
+        test_looker._Looker__base_url = (
             f"http://this-url-definitely-does-not-exist{secrets.token_urlsafe(16)}"
         )
 
         with self.assertRaises(requests.exceptions.ConnectionError):
             test_looker.looker_login()
 
-    # technically not a unit_test, but including anyway
     @pytest.mark.unit_test
     def test_when_login_with_valid_url_but_invalid_credentials_then_should_raise_JSONDecodeError(
         self,
     ):
+        # Need to actually include integration tests
+        # This will stay in unit_tests until that point
         test_looker = Looker()
+        test_looker._Looker__base_url = "https://lookerdev.trimedx.com:443/api/4.0"
         test_looker._Looker__client_id = (
             self.lk._Looker__client_id + secrets.token_urlsafe(16)
         )
@@ -227,7 +247,7 @@ class TestLooker(unittest.TestCase):
     def test_when_passing_full_elt_type_then_set_payload_filters_value_to_None(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk.base_url}/queries/run/json"
+        url = f"{self.lk._Looker__base_url}/queries/run/json"
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict({"foo": "bar", "filters": "bar"})
         mock_get_data_payload.return_value = fake_data_payload
@@ -246,7 +266,7 @@ class TestLooker(unittest.TestCase):
     def test_when_passing_delta_elt_type_then_call_format_looker_and_change_field_name(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk.base_url}/queries/run/json"
+        url = f"{self.lk._Looker__base_url}/queries/run/json"
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict(
             {
@@ -279,7 +299,7 @@ class TestLooker(unittest.TestCase):
         )
 
         mock_requests_post.assert_called_with(
-            url=f"{self.lk.base_url}/queries/run/json",
+            url=f"{self.lk._Looker__base_url}/queries/run/json",
             json=fake_data_payload,
             headers=self.fake_headers,
         )
@@ -290,7 +310,7 @@ class TestLooker(unittest.TestCase):
     def test_when_calling_looker_get_data_then_expect_result_to_be_a_json_array(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk.base_url}/queries/run/json"
+        url = f"{self.lk._Looker__base_url}/queries/run/json"
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict(
             {

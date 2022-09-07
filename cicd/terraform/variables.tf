@@ -2,6 +2,7 @@ variable "rg_name" {
   type        = string
   description = "Resource Group name to where resources are going to be deployed"
 }
+
 variable "acr_name" {
   type        = string
   description = "Azure Container Registry name"
@@ -42,9 +43,24 @@ variable "storage_account_endpoint" {
   description = "Azure storage account endpoint / connection string"
 }
 
+variable "storage_account_connection_string" {
+  type        = string
+  description = "Azure storage account connection string"
+}
+
 variable "okta_secret" {
   type        = string
   description = "Okta authentication token"
+}
+
+variable "okta_container_group_name" {
+  type        = string
+  description = "Okta container-group name in Azure"
+}
+
+variable "looker_container_group_name" {
+  type        = string
+  description = "Looker container-group name in Azure"
 }
 
 variable "looker_client_id" {
@@ -55,4 +71,19 @@ variable "looker_client_id" {
 variable "looker_client_secret" {
   type        = string
   description = "Looker authentication client secret "
+}
+
+variable "looker_url" {
+  type        = string
+  description = "Looker url for the given environment / container"
+}
+
+variable "looker_port" {
+  type        = string
+  description = "Looker port number"
+}
+
+variable "looker_api_endpoint" {
+  type        = string
+  description = "Looker api endpoint with version"
 }

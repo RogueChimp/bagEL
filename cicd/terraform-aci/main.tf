@@ -75,6 +75,9 @@ resource "azurerm_container_group" "looker_cg" {
       AZURE_CONTAINER = var.azure_container
       AZURE_TABLE = var.azure_table
       LOOKER_CLIENT_ID = var.looker_client_id
+      LOOKER_URL = var.looker_url
+      LOOKER_PORT = var.looker_port
+      LOOKER_API_ENDPOINT = var.looker_api_endpoint
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
     }
