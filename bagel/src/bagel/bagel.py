@@ -207,39 +207,43 @@ class Bagel:
             historical_batch,
             historical_frequency,
         )
-        counter = 0
+
         for i in range(len(date_ranges) - 1):
+            # Retrieve Data
+            lr_t = date_ranges[i]
+            c_t = date_ranges[i + 1]
+
             integration_data = self.integration.get_data(
                 table_name,
                 elt_type=elt_type,
-                last_run_timestamp=date_ranges[i],
-                current_timestamp=date_ranges[i + 1],
+                last_run_timestamp=lr_t,
+                current_timestamp=c_t,
             )
 
+            # Validate Data
             data = self._validate_data(integration_data)
 
-            # get data
             counter, data_log = self._process_data(table_name, data)
 
-            logger.info(f"Files: {data_log}")
+            logger.info(f"Uploaded {counter} Rows / Files: {data_log}")
 
-        # overwrite last run timestamp
-        entity = self.write_run_timestamp(
-            table_client, self.integration.name, table_name, current_timestamp
-        )
-        table_client.close()
-
-        logger.info(f"Azure Table New Entity: {entity}")
-        logger.info(f"Files Created: {counter}")
-
-        # upload log
-        with open(log_file_name, "rb") as logfile:
-            self.write_json_to_blob(
-                format_json_blob_name(
-                    self.integration.name, table_name, datetime.utcnow(), True
-                ),
-                logfile,
+            # overwrite last run timestamp
+            entity = self.write_run_timestamp(
+                table_client, self.integration.name, table_name, timestamp=c_t
             )
+
+            logger.info(f"Azure Table New Entity: {entity}")
+
+            # upload log
+            with open(log_file_name, "rb") as logfile:
+                self.write_json_to_blob(
+                    format_json_blob_name(
+                        self.integration.name, table_name, datetime.utcnow(), True
+                    ),
+                    logfile,
+                )
+
+        table_client.close()
         logger.info("Job Complete")
 
     def _process_data(self, table_name, data):
