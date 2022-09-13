@@ -9,12 +9,13 @@ from unittest import mock
 from src.bagel.bagel import (
     Bagel,
     BagelError,
-    format_json_blob_name,
+    format_blob_name,
     format_dict_to_json_binary,
     extract_date_ranges,
     get_historical_batch_ranges,
 )
 from src.bagel.integration import BagelIntegration
+from src.bagel.data import Bite
 
 
 class TestBagel(unittest.TestCase):
@@ -74,7 +75,7 @@ class TestBagel(unittest.TestCase):
         table = "bar"
         dt = datetime(2022, 6, 24, 9, 26, 9, 548513)
         expected = "foo/data/bar/2022/06/24/bar_2022_06_24T09_26_09_548513Z.json"
-        result = format_json_blob_name(system, table, dt)
+        result = format_blob_name(system, table, dt)
 
         assert result == expected
 
@@ -85,7 +86,7 @@ class TestBagel(unittest.TestCase):
         table = "bar"
         dt = datetime(2022, 6, 24, 9, 26, 9, 548513)
         expected = "foo/log/bar/2022/06/24/bar_2022_06_24T09_26_09_548513Z.json"
-        result = format_json_blob_name(system, table, dt, log=True)
+        result = format_blob_name(system, table, dt, log=True)
 
         assert result == expected
 
@@ -127,15 +128,15 @@ class TestBagel(unittest.TestCase):
         self.assertListEqual(results, expected)
 
     @pytest.mark.unit_test
-    @mock.patch("src.bagel.bagel.Bagel.write_json_to_blob")
-    @mock.patch("src.bagel.bagel.format_json_blob_name")
+    @mock.patch("src.bagel.bagel.Bagel.write_to_blob")
+    @mock.patch("src.bagel.bagel.format_blob_name")
     @mock.patch("src.bagel.bagel.os.getenv")
     def test_when_integration_data_is_formatted_incorrectly_then_raise(
-        self, mock_getenv, mock_format_json_blob_name, mock_write_json_to_blob
+        self, mock_getenv, mock_format_blob_name, mock_write_to_blob
     ):
 
         mock_getenv.return_value = "asdf"
-        mock_format_json_blob_name.return_value = "asdf"
+        mock_format_blob_name.return_value = "asdf"
 
         proper_list_format = [
             {"foo": "bar"},
@@ -149,16 +150,16 @@ class TestBagel(unittest.TestCase):
             ]
         ]
 
-        expected = [proper_list_format]
+        expected = [Bite(content=proper_list_format)]
 
         # test list format
         bagel = Bagel(self.test_integration)
-        results = bagel._validate_data(proper_list_format)
+        results = bagel._validate_data(Bite(content=proper_list_format))
 
         assert results == expected
 
         with self.assertRaises(TypeError):
-            bagel._validate_data(improper_list_format)
+            Bite(improper_list_format)
 
         # test generators
         def get_data_proper_generator():
@@ -166,7 +167,7 @@ class TestBagel(unittest.TestCase):
             data = [proper_list_format]
 
             for d in data:
-                yield d
+                yield Bite(d)
 
             return None
 
@@ -178,20 +179,20 @@ class TestBagel(unittest.TestCase):
             data = [improper_list_format]
 
             for d in data:
-                yield d
+                yield Bite(d)
 
             return None
 
-        data = bagel._validate_data(get_data_improper_generator())
         with self.assertRaises(TypeError):
+            data = bagel._validate_data(get_data_improper_generator())
             bagel._process_data(data)
 
     @pytest.mark.unit_test
-    @mock.patch("src.bagel.bagel.Bagel.write_json_to_blob")
-    @mock.patch("src.bagel.bagel.format_json_blob_name")
+    @mock.patch("src.bagel.bagel.Bagel.write_to_blob")
+    @mock.patch("src.bagel.bagel.format_blob_name")
     @mock.patch("src.bagel.bagel.os.getenv")
     def test_when_data_is_empty_list_should_return_an_empty_array_and_pass_through(
-        self, mock_getenv, mock_format_json_blob_name, mock_write_json_to_blob
+        self, mock_getenv, mock_format_blob_name, mock_write_to_blob
     ):
 
         input_ = [

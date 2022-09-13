@@ -1,5 +1,5 @@
 import requests
-from bagel import Bagel, BagelIntegration
+from bagel import Bagel, BagelIntegration, Bite
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class Schmear(BagelIntegration):
         data = requests.get("http://127.0.0.1:5000").json()
 
         while data:
-            yield data
+            yield Bite(data)
             data = requests.get("http://127.0.0.1:5000").json()
         return None
 

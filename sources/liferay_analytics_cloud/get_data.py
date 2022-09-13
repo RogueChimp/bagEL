@@ -3,7 +3,7 @@ import requests
 import logging
 import time
 import json
-from bagel import Bagel, BagelIntegration
+from bagel import Bagel, BagelIntegration, Bite
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,7 +28,7 @@ class LiferayAnalyticsCloud(BagelIntegration):
         )
         self.file_status = "PENDING"
         data = self.liferay_analytics_cloud_get_data(self.file_status, self.url)
-        return data
+        return Bite(data)
 
     def liferay_analytics_cloud_get_url(
         self, table, last_run_timestamp, current_timestamp

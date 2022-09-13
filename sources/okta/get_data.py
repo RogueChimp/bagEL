@@ -5,7 +5,7 @@ import logging
 import pendulum
 import requests
 
-from bagel import Bagel, BagelIntegration
+from bagel import Bagel, BagelIntegration, Bite
 
 
 logging.basicConfig(
@@ -41,7 +41,7 @@ class Okta(BagelIntegration):
             data, self.next_url, rate_limit, next_reset_epoch = self.okta_get_data(
                 self.next_url
             )
-            yield data
+            yield Bite(data)
         return None
 
     def okta_get_url(self, table, last_run_timestamp, current_timestamp):

@@ -4,35 +4,50 @@ import json
 import logging
 import os
 import traceback
+from bagel.data import Bite
 import pandas as pd
-import types
+from typing import Generator, List, Union
 from typing import List, Optional
 from azure.data.tables import TableServiceClient, UpdateMode
 from azure.core.credentials import AzureNamedKeyCredential
 from azure.storage.blob import BlobServiceClient
 import yaml
+from dotenv import load_dotenv
 
 from .integration import BagelIntegration
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+load_dotenv(override=True)
+
 
 def format_table_name(name: str) -> str:
-    return name.lower().replace(" ", "_")
+    return name.lower().replace(" ", "_").replace("-", "_")
 
 
-def format_json_blob_name(system, table, timestamp, log=False):
+def format_blob_name(
+    system, table, timestamp, log=False, file_format=None, file_name=None
+):
+    if file_format is None:
+        file_format = "json"
+
     year = timestamp.strftime("%Y")
     month = timestamp.strftime("%m")
     day = timestamp.strftime("%d")
+
     full_date = format_timestamp_to_str(timestamp)
+
+    _file_name = f"{table}_{full_date}"
+    if file_name:
+        _file_name += f"-{file_name}"
+
     if log:
         file_type = "log"
     else:
         file_type = "data"
     file_name = (
-        f"{system}/{file_type}/{table}/{year}/{month}/{day}/{table}_{full_date}.json"
+        f"{system}/{file_type}/{table}/{year}/{month}/{day}/{_file_name}.{file_format}"
     )
     return file_name
 
@@ -179,6 +194,7 @@ class Bagel:
             elt_type,
             historical_batch,
             historical_frequency,
+            file_format,
             initial_timestamp,
         ) = self._load_table_config(table_config)
 
@@ -211,21 +227,24 @@ class Bagel:
         )
 
         for i in range(len(date_ranges) - 1):
-            # Retrieve Data
             lr_t = date_ranges[i]
             c_t = date_ranges[i + 1]
 
-            integration_data = self.integration.get_data(
+            integration_data = self.integration.execute(
                 table_name,
-                elt_type=elt_type,
-                last_run_timestamp=lr_t,
-                current_timestamp=c_t,
+                **{
+                    "elt_type": elt_type,
+                    "last_run_timestamp": lr_t,
+                    "current_timestamp": c_t,
+                    **table_config,
+                },
             )
 
             # Validate Data
             data = self._validate_data(integration_data)
 
-            counter, data_log = self._process_data(table_name, data)
+            # get data
+            counter, data_log = self._process_data(table_name, data, file_format)
 
             logger.info(f"Uploaded {counter} Rows / Files: {data_log}")
 
@@ -238,9 +257,9 @@ class Bagel:
 
             # upload log
             with open(log_file_name, "rb") as logfile:
-                self.write_json_to_blob(
-                    format_json_blob_name(
-                        self.integration.name, table_name, datetime.utcnow(), True
+                self.write_to_blob(
+                    format_blob_name(
+                        self.integration.name, table_name, datetime.utcnow(), log=True
                     ),
                     logfile,
                 )
@@ -248,11 +267,52 @@ class Bagel:
         table_client.close()
         logger.info("Job Complete")
 
+    def _process_data(
+        self,
+        table_name: str,
+        data: Union[Generator[Bite, None, None], List[Bite]],
+        file_format: str,
+    ):
+        counter = 0
+        data_log = []
+        for d in data:
+
+            # generate file_name
+            file_name = format_blob_name(
+                self.integration.name,
+                table_name,
+                datetime.utcnow(),
+                file_format=file_format,
+                file_name=d.file_name,
+            )
+
+            if not file_format or file_format == "json":
+                formatted_data = format_dict_to_json_binary(d.content)
+            else:
+                formatted_data = d.content
+
+            self.write_to_blob(file_name, formatted_data)
+            data_log.append(file_name)
+
+            counter += 1
+        return counter, data_log
+
+    def _validate_data(self, data: Bite):
+
+        if not (isinstance(data, Generator) or data.__class__.__name__ == "Bite"):
+            raise TypeError("get_data must provide Bite or generator object")
+
+        if data.__class__.__name__ == "Bite":
+            data = [data]
+
+        return data
+
     def _load_table_config(self, table_config):
         table_name = format_table_name(table_config["name"])
         elt_type = table_config.get("elt_type")
         historical_batch = table_config.get("historical_batch", False)
-        historical_frequency = table_config.get("historical_frequency", None)
+        historical_frequency = table_config.get("historical_frequency")
+        file_format = table_config.get("file_format")
         initial_timestamp: Optional[datetime] = table_config.get("initial_timestamp")
 
         return (
@@ -260,41 +320,9 @@ class Bagel:
             elt_type,
             historical_batch,
             historical_frequency,
+            file_format,
             initial_timestamp,
         )
-
-    def _process_data(self, table_name, data):
-        counter = 0
-        data_log = []
-        for d in data:
-            if not isinstance(d, list):
-                raise TypeError("Datapoint needs to be of type list")
-
-            # generate file_name
-            file_name = format_json_blob_name(
-                self.integration.name, table_name, datetime.utcnow()
-            )
-
-            self.write_json_to_blob(file_name, format_dict_to_json_binary(d))
-            data_log.append(file_name)
-
-            counter += 1
-        return counter, data_log
-
-    def _validate_data(self, data):
-
-        if not (isinstance(data, types.GeneratorType) or isinstance(data, list)):
-            raise TypeError("get_data must provide list or generator object")
-
-        if isinstance(data, list):
-            if len(data) == 0:
-                return data
-
-            if isinstance(data[0], list):
-                raise TypeError("Cannot be list of lists. Use pagination/generator.")
-            data = [data]
-
-        return data
 
     def get_timebox(
         self, table_client, table_name, initial_timestamp: Optional[datetime] = None
@@ -359,7 +387,7 @@ class Bagel:
             final_timestamp = timestamp
         return final_timestamp
 
-    def write_json_to_blob(self, file_name, data):
+    def write_to_blob(self, file_name, data):
         """
         takes json from API call and creates a blob in the correct folders.
         TODO: calls split_file if neccesary for large files.

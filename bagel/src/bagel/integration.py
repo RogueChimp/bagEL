@@ -15,3 +15,9 @@ class BagelIntegration(metaclass=abc.ABCMeta):
         **kwargs,
     ):
         pass
+
+    def execute(self, table: str, **kwargs):
+
+        data = self.get_data(table, **kwargs)
+
+        return data

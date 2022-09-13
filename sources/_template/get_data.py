@@ -1,6 +1,6 @@
 import logging
 
-from bagel import Bagel, BagelIntegration
+from bagel import Bagel, BagelIntegration, Bite
 
 
 logging.basicConfig(
@@ -50,7 +50,7 @@ class Template(BagelIntegration):
             ]
 
             for d in data:
-                yield d
+                yield Bite(d)
 
             return None
 
@@ -61,7 +61,7 @@ class Template(BagelIntegration):
                 {"c": 2},
             ]
 
-            return data
+            return Bite(data)
 
 
 if __name__ == "__main__":

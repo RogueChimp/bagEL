@@ -193,6 +193,7 @@ class TestLooker(unittest.TestCase):
         mock_get_data,
         mock_login,
     ):
+        mock_get_data.return_value = []
         mock_login.return_value = self.fake_headers
 
         self.lk.get_data(table=self.fake_table_name, elt_type=self.elt_type["full"])
@@ -210,6 +211,7 @@ class TestLooker(unittest.TestCase):
         mock_get_data,
         mock_login,
     ):
+        mock_get_data.return_value = []
         mock_login.return_value = self.fake_headers
 
         self.lk.get_data(

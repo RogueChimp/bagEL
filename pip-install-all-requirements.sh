@@ -1,4 +1,5 @@
-pip install ./bagel
+pip install -e ./bagel
+pip install -r ./bagel/requirements.txt
 
 cd sources
 for path in ./*; do

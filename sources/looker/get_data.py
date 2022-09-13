@@ -3,7 +3,7 @@ import requests
 import json
 import datetime
 import logging
-from bagel import Bagel, BagelIntegration
+from bagel import Bagel, BagelIntegration, Bite
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,7 +37,7 @@ class Looker(BagelIntegration):
             kwargs.get("last_run_timestamp", None),
             kwargs.get("current_timestamp", None),
         )
-        return data
+        return Bite(data)
 
     def get_data_payload(self, table: str):
         """
