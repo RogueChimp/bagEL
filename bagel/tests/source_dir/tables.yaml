@@ -7,3 +7,5 @@ tables:
   elt_type: delta
   historical_batch: true
   historical_frequency: D
+- name: my_table_3
+  initial_timestamp: 2000-01-01T00:00:00.0Z

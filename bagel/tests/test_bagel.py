@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import os
 
@@ -112,13 +112,19 @@ class TestBagel(unittest.TestCase):
                 "historical_batch": True,
                 "historical_frequency": "D",
             },
+            {
+                "name": "my_table_3",
+                "initial_timestamp": datetime(
+                    2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc
+                ),
+            },
         ]
 
         bagel = Bagel(self.test_integration)
         results = bagel.get_table_list()
 
-        assert len(results) == 3
-        assert results == expected
+        assert len(results) == len(expected)
+        self.assertListEqual(results, expected)
 
     @pytest.mark.unit_test
     @mock.patch("src.bagel.bagel.Bagel.write_json_to_blob")
@@ -290,3 +296,26 @@ class TestBagel(unittest.TestCase):
         assert date_ranges[0] == start_time
         assert date_ranges[-1] == end_time
         assert date_ranges[1] == start_time + delta
+
+    @pytest.mark.unit_test
+    @mock.patch("src.bagel.bagel.Bagel._get_table_path")
+    @mock.patch("src.bagel.bagel.os.getenv")
+    def test_when_initial_timestamp_in_config_then_load(
+        self, mock_getenv, mock__get_table_path
+    ):
+        mock__get_table_path.return_value = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            "source_dir",
+            "tables.yaml",
+        )
+
+        mock_getenv.return_value = "asdf"
+
+        bagel = Bagel(self.test_integration)
+        tables = bagel.get_table_list()
+        table_config = tables[3]
+        loaded_config = bagel._load_table_config(table_config)
+        result = loaded_config[-1]
+        expected = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
+        assert result == expected

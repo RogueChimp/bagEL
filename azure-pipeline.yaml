@@ -51,7 +51,7 @@ steps:
     - script: pip install black && black . --check
       displayName: Black formatting/linting
       
-    - script: pip install pytest pytest-cov black
+    - script: pip install pytest pytest-cov
       displayName: Install pytest
 
     - task: Bash@3

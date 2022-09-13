@@ -6,7 +6,7 @@ import os
 import traceback
 import pandas as pd
 import types
-from typing import List
+from typing import List, Optional
 from azure.data.tables import TableServiceClient, UpdateMode
 from azure.core.credentials import AzureNamedKeyCredential
 from azure.storage.blob import BlobServiceClient
@@ -26,7 +26,7 @@ def format_json_blob_name(system, table, timestamp, log=False):
     year = timestamp.strftime("%Y")
     month = timestamp.strftime("%m")
     day = timestamp.strftime("%d")
-    full_date = format_time(timestamp)
+    full_date = format_timestamp_to_str(timestamp)
     if log:
         file_type = "log"
     else:
@@ -37,7 +37,7 @@ def format_json_blob_name(system, table, timestamp, log=False):
     return file_name
 
 
-def format_time(timestamp):
+def format_timestamp_to_str(timestamp: datetime):
     full_date = timestamp.strftime("%Y_%m_%dT%H_%M_%S_%fZ")
     return full_date
 
@@ -161,15 +161,8 @@ class Bagel:
 
         for t in tables:
 
-            table_name = format_table_name(t["name"])
-            elt_type = t["elt_type"]
-            historical_batch = t.get("historical_batch", False)
-            historical_frequency = t.get("historical_frequency", None)
-
             try:
-                self._run_table(
-                    table_name, elt_type, historical_batch, historical_frequency
-                )
+                self._run_table(t)
 
             except Exception as e:
                 errors.append(traceback.format_exc())
@@ -179,11 +172,19 @@ class Bagel:
         if errors:
             raise BagelError(errors)
 
-    def _run_table(self, table_name, elt_type, historical_batch, historical_frequency):
+    def _run_table(self, table_config: dict):
+
+        (
+            table_name,
+            elt_type,
+            historical_batch,
+            historical_frequency,
+            initial_timestamp,
+        ) = self._load_table_config(table_config)
 
         log_file_name = os.path.join(
             "logs",
-            f"{self.integration.name}_{table_name}_{format_time(self.get_current_timestamp())}.log",
+            f"{self.integration.name}_{table_name}_{format_timestamp_to_str(self.get_current_timestamp())}.log",
         )
 
         table_client = self.connect_azure_table()
@@ -193,9 +194,10 @@ class Bagel:
         logger.info(f"elt_type: {elt_type}")
         logger.info(f"historical_batch: {historical_batch}")
         logger.info(f"historical_frequency: {historical_frequency}")
+        logger.info(f"initial_timestamp: {initial_timestamp}")
 
         last_run_timestamp, current_timestamp = self.get_timebox(
-            table_client, table_name
+            table_client, table_name, initial_timestamp
         )
 
         logger.info(f"Current Timestamp: {current_timestamp}")
@@ -246,6 +248,21 @@ class Bagel:
         table_client.close()
         logger.info("Job Complete")
 
+    def _load_table_config(self, table_config):
+        table_name = format_table_name(table_config["name"])
+        elt_type = table_config.get("elt_type")
+        historical_batch = table_config.get("historical_batch", False)
+        historical_frequency = table_config.get("historical_frequency", None)
+        initial_timestamp: Optional[datetime] = table_config.get("initial_timestamp")
+
+        return (
+            table_name,
+            elt_type,
+            historical_batch,
+            historical_frequency,
+            initial_timestamp,
+        )
+
     def _process_data(self, table_name, data):
         counter = 0
         data_log = []
@@ -279,14 +296,16 @@ class Bagel:
 
         return data
 
-    def get_timebox(self, table_client, table_name):
+    def get_timebox(
+        self, table_client, table_name, initial_timestamp: Optional[datetime] = None
+    ):
 
         # get current timestamp
         current_timestamp = self.get_current_timestamp()
 
         # get last run timestamp
         last_run_timestamp = self.get_last_run_timestamp(
-            table_client, self.integration.name, table_name
+            table_client, self.integration.name, table_name, initial_timestamp
         )
 
         return last_run_timestamp, current_timestamp
@@ -316,16 +335,26 @@ class Bagel:
         )
         return container_client
 
-    def get_last_run_timestamp(self, table_client, system, table):
+    def get_last_run_timestamp(
+        self, table_client, system, table, initial_timestamp: Optional[datetime] = None
+    ):
         """
         queries the Azure table to get the last time the system/table was run.
         """
         try:
             entity = table_client.get_entity(partition_key=system, row_key=table)
+        except:
+            entity = None
+
+        if entity:
             timestamp = str(entity["last_updated_timestamp"])
             final_timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
-        except:
-            timestamp = datetime.now() - timedelta(days=3)
+        elif not entity:
+            timestamp = (
+                initial_timestamp
+                if initial_timestamp
+                else datetime.now() - timedelta(days=3)
+            )
             self.write_run_timestamp(table_client, system, table, timestamp)
             final_timestamp = timestamp
         return final_timestamp
@@ -339,7 +368,9 @@ class Bagel:
         container_client.upload_blob(file_name, data, overwrite=True)
         container_client.close()
 
-    def write_run_timestamp(self, table_client, system, table, timestamp):
+    def write_run_timestamp(
+        self, table_client: str, system: str, table: str, timestamp: datetime
+    ):
         """
         upserts the timestamp of the current run into the Azure table.
         """
