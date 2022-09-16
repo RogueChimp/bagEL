@@ -54,10 +54,13 @@ steps:
     - script: pip install pytest pytest-cov
       displayName: Install pytest
 
+    - script: pip install -r bagel/requirements.txt
+      displayName: Install bagel dependencies
+
     - task: Bash@3
       inputs:
         filePath: pip-install-all-requirements.sh
-      displayName: Install dependencies
+      displayName: Install source dependencies
 
     - task: Bash@3
       inputs:
@@ -93,6 +96,7 @@ steps:
         - okta
         - looker
         # - etq
+        - liferay_analytics_cloud
 
   - template: cicd/templates/terraform-apply.yaml
     parameters:

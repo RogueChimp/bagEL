@@ -12,6 +12,7 @@ data "azurerm_storage_account" "store_acct" {
   resource_group_name      = var.rg_name
 }
 
+#okta
 resource "azurerm_container_group" "okta_cg" {
   name                = var.okta_container_group_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -52,6 +53,7 @@ resource "azurerm_container_group" "okta_cg" {
 
 }
 
+#looker
 resource "azurerm_container_group" "looker_cg" {
   name                = var.looker_container_group_name 
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -70,7 +72,7 @@ resource "azurerm_container_group" "looker_cg" {
     image  = "${data.azurerm_container_registry.acr.login_server}/looker:${var.build_id}"
     cpu    = "0.5"
     memory = "1.5"
-
+ 
     environment_variables = {
       AZURE_CONTAINER = var.azure_container
       AZURE_TABLE = var.azure_table
@@ -86,6 +88,46 @@ resource "azurerm_container_group" "looker_cg" {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
       LOOKER_CLIENT_SECRET = var.looker_client_secret
+    }
+
+    ports {
+          port     = 443
+          protocol = "TCP"
+    }
+  }
+}
+
+#liferay analytics cloud
+resource "azurerm_container_group" "liferay_analytics_cloud_cg" {
+  name                = var.liferay_analytics_cloud_container_group_name 
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  restart_policy      = "Never"
+
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
+
+  container {
+    name   = "liferay-analytics-cloud"
+    image  = "${data.azurerm_container_registry.acr.login_server}/liferay_analytics_cloud:${var.build_id}"
+    cpu    = "0.5"
+    memory = "1.5"
+ 
+    environment_variables = {
+      AZURE_CONTAINER = var.azure_container
+      AZURE_TABLE = var.azure_table
+      STORAGE_ACCOUNT = var.storage_account
+      STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+    }
+
+    secure_environment_variables =  {
+      STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      LIFERAY_ANALYTICS_CLOUD_TOKEN = var.liferay_analytics_cloud_token
     }
 
     ports {

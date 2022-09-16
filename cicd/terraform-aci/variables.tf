@@ -102,3 +102,13 @@ variable "looker_api_endpoint" {
 #   type        = string
 #   description = "Looker authentication password"
 # }
+
+variable "liferay_analytics_cloud_container_group_name" {
+  type        = string
+  description = "Liferay Analytics Cloud container-group name in Azure"
+}
+
+variable "liferay_analytics_cloud_token" {
+  type        = string
+  description = "Liferay Analytics Cloud API token"
+}

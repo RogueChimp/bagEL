@@ -42,7 +42,6 @@ class LiferayAnalyticsCloud(BagelIntegration):
         since = f"fromDate={last_run_timestamp}"
         until = f"toDate={current_timestamp}"
         url = f"{self.base_url}{table}?{since}&{until}"
-        # url = "http://analytics.liferay.com/api/reports/export/individual?fromDate=2022-08-15T00:45:03.446Z&toDate=2022-08-16T00:45:03.446Z"
         return url
 
     def liferay_analytics_cloud_get_data(self, file_status, url):
@@ -55,18 +54,21 @@ class LiferayAnalyticsCloud(BagelIntegration):
             logging.info(f"...looking for file")
             response = requests.get(url, headers=query)
             data_text = response.text
+            if "Content-Type" not in response.headers:
+                raise ValueError(f"...Blank response. Likely an auth problem... {url}")
             status = response.status_code
             if status != 200:
                 logging.error(f"...API Error {status}")
                 raise ValueError(f"API error.{status}...{url}")
             split_text = data_text.split("\n")
+            logging.debug(f"...response.text: {data}")
             for item in split_text:
                 if item:
                     j = json.loads(item)
                     data.append(j)
             logging.debug(f"...data: {data}")
             if any("status" in d for d in data):
-                print("..." + data[0]["status"])
+                logging.info("..." + data[0]["status"])
                 time.sleep(30)
             else:
                 file_status = "COMPLETE"

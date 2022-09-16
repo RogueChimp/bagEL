@@ -12,13 +12,12 @@ from azure.data.tables import TableServiceClient, UpdateMode
 from azure.core.credentials import AzureNamedKeyCredential
 from azure.storage.blob import BlobServiceClient
 import yaml
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from .integration import BagelIntegration
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
 load_dotenv(override=True)
 
 
@@ -68,8 +67,9 @@ def extract_date_ranges(
         date_ranges = get_historical_batch_ranges(
             last_run_timestamp, current_timestamp, historical_frequency
         )
-    elif not historical_batch:
+    if not historical_batch or len(date_ranges) == 1:
         date_ranges = [last_run_timestamp, current_timestamp]
+    logger.info(date_ranges)
     return date_ranges
 
 

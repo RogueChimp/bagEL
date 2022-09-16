@@ -19,4 +19,6 @@ okta_container_group_name = "ci-sbox-tmx-nc-bagelokta"
 # etq_user = "#{ETQ_USER}#"
 # etq_password = "#{ETQ_PASSWORD}#"
 # etq_env = "dev"
+liferay_analytics_cloud_container_group_name = "ci-sbox-tmx-nc-bagelliferayanalyticscloud"
+liferay_analytics_cloud_token = "#{LIFERAY-ANALYTICS-CLOUD-TOKEN}#"
 env = sbox
