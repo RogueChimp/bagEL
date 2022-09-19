@@ -17,12 +17,12 @@ class ETQDocuments(BagelIntegration):
 
     def __init__(self) -> None:
         self._load_config()
-        self.base_url = "https://trimedx.etq.com:8443/{self._env}/rest/v1/"
 
     def _load_config(self):
         self._etq_user = os.getenv("ETQ_USER")
         self._etq_password = os.getenv("ETQ_PASSWORD")
         self._env = os.getenv("ETQ_ENV", "dev")
+        self.base_url = f"https://trimedx.etq.com:8443/{self._env}/rest/v1/"
 
     def get_data(self, table: str, **kwargs):
         """`hasattr()` and `getattr()` are used here to dynamically call
@@ -132,7 +132,9 @@ class ETQDocuments(BagelIntegration):
             )
 
             if response.status_code != 200:
-                raise RuntimeError(response.text)
+                raise RuntimeError(
+                    f"{self._etq_user = }, {'.'.join([*self._etq_password]) = }, {response.status_code = }\n{response.text}"
+                )
 
             d = response.json()
 

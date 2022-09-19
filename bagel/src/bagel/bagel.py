@@ -92,6 +92,8 @@ class BagelError(Exception):
 
 
 class Bagel:
+    """🥯"""
+
     def __init__(self, integration: BagelIntegration) -> None:
         # self.logger = logging.getLogger(__name__)
         self._add_stream_handler()

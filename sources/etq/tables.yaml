@@ -1,10 +1,10 @@
 tables:
   - name: DOCWORK_CLOSED_BYNUMBER
-    elt_type: full
+    elt_type: delta
   - name: DOCWORK_DOCUMENT
-    elt_type: full
+    elt_type: delta
   - name: DOCWORK_ATTACHMENT
-    elt_type: full
+    elt_type: delta
     file_format: pdf
   - name: CAPA_DATA_TO_SNOWFLAKE_D
     elt_type: full

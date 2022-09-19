@@ -88,17 +88,17 @@ variable "looker_api_endpoint" {
   description = "Looker api endpoint with version"
 }
 
-# variable "etq_container_group_name" {
-#   type        = string
-#   description = "ETQ container-group name in Azure"
-# }
+variable "etq_container_group_name" {
+  type        = string
+  description = "ETQ container-group name in Azure"
+}
 
-# variable "etq_user" {
-#   type        = string
-#   description = "ETQ username"
-# }
+variable "etq_user" {
+  type        = string
+  description = "ETQ username"
+}
 
-# variable "etq_password" {
-#   type        = string
-#   description = "ETQ password"
-# }
+variable "etq_password" {
+  type        = string
+  description = "ETQ password"
+}

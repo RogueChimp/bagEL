@@ -96,7 +96,7 @@ steps:
         - okta
         - looker
         - looker_sdk
-        # - etq
+        - etq
         #- liferay_analytics_cloud
 
   - template: cicd/templates/terraform-apply.yaml
