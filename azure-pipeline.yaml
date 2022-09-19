@@ -95,8 +95,9 @@ steps:
       container_sources: 
         - okta
         - looker
+        - looker_sdk
         # - etq
-        - liferay_analytics_cloud
+        #- liferay_analytics_cloud
 
   - template: cicd/templates/terraform-apply.yaml
     parameters:

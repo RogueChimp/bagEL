@@ -112,3 +112,20 @@ variable "liferay_analytics_cloud_token" {
   type        = string
   description = "Liferay Analytics Cloud API token"
 }
+
+variable "looker_sdk_client_id" {
+  type        = string
+  description = "looker client id"
+}
+variable "looker_sdk_client_secret" {
+  type        = string
+  description = "looker client secret"
+}
+variable "looker_sdk_base_url" {
+  type        = string
+  description = "looker url with port"
+}
+variable "looker_sdk_container_group_name" {
+  type        = string
+  description = "looker sdk container group name"
+}

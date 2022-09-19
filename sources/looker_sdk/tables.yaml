@@ -1,0 +1,5 @@
+tables:
+  - name: all_users
+    elt_type: full 
+  - name: user_attributes
+    elt_type: full    
