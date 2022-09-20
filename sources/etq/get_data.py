@@ -47,7 +47,8 @@ class ETQDocuments(BagelIntegration):
                     modified_date = datetime.strptime(
                         record["DOCWOR_DOCUMEN_ETQ$MODIFIE_DAT"], "%Y-%m-%d %H:%M:%S.%f"
                     )
-                    if modified_date <= kwargs["last_run_timestamp"]:
+                    lr_t: datetime = kwargs["last_run_timestamp"]
+                    if modified_date.timestamp() <= lr_t.timestamp():
                         continue
 
                 to_send.append(record)
