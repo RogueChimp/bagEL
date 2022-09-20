@@ -58,11 +58,11 @@ class ETQDocuments(BagelIntegration):
         for r in self._docwork_closed_bynumber(table, **kwargs):
             yield Bite(r)
 
-    def _docwork_document(self):
+    def _docwork_document(self, **kwargs):
 
         docwork_records = []
 
-        for d in self._docwork_closed_bynumber("docwork_closed_bynumber"):
+        for d in self._docwork_closed_bynumber("docwork_closed_bynumber", **kwargs):
             docwork_records += d
 
         docs = []
@@ -82,11 +82,11 @@ class ETQDocuments(BagelIntegration):
         return docs
 
     def docwork_document(self, table, **kwargs):
-        return Bite(self._docwork_document())
+        return Bite(self._docwork_document(**kwargs))
 
     def docwork_attachment(self, table, **kwargs):
 
-        for data in self._docwork_document():
+        for data in self._docwork_document(**kwargs):
             document = data["Document"][0]
             fields = document["Fields"]
             attachment = [f for f in fields if f["fieldName"] == "DOCWORK_ATTACHMENTS"][
@@ -132,9 +132,7 @@ class ETQDocuments(BagelIntegration):
             )
 
             if response.status_code != 200:
-                raise RuntimeError(
-                    f"{self._etq_user = }, {'.'.join([*self._etq_password]) = }, {response.status_code = }\n{response.text}"
-                )
+                raise RuntimeError(f"{response.status_code = }\n{response.text}")
 
             d = response.json()
 
