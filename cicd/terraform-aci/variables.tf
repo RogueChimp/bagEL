@@ -103,6 +103,17 @@ variable "etq_password" {
   description = "ETQ authentication password"
 }
 
+variable "aha_container_group_name" {
+  type        = string
+  description = "Aha! container-group name in Azure"
+}
+
+variable "aha_token" {
+  type        = string
+  description = "Aha! API token"
+}
+
+
 variable "liferay_analytics_cloud_container_group_name" {
   type        = string
   description = "Liferay Analytics Cloud container-group name in Azure"

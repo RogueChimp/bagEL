@@ -25,4 +25,6 @@ etq_password = "#{ETQ-SECRET}#"
 etq_env = "dev"
 liferay_analytics_cloud_container_group_name = "ci-sbox-tmx-nc-bagelliferayanalyticscloud"
 liferay_analytics_cloud_token = "#{LIFERAY-ANALYTICS-CLOUD-TOKEN}#"
+aha_container_group_name = "ci-sbox-tmx-nc-bagelaha"
+aha_token = "#{AHA-TOKEN}#"
 env = sbox

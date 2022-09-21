@@ -97,6 +97,7 @@ steps:
         - looker
         - looker_sdk
         - etq
+        - aha
         #- liferay_analytics_cloud
 
   - template: cicd/templates/terraform-apply.yaml

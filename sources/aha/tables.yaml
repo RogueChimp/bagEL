@@ -1,0 +1,7 @@
+tables:
+  - name: ideas
+    elt_type: delta
+    initial_timestamp: 2018-01-01T00:00:00.0Z
+  - name: endorsements
+    elt_type: delta
+    initial_timestamp: 2018-01-01T00:00:00.0Z
