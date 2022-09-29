@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+from bagel.table import Table
 import requests
 import secrets
 
@@ -38,6 +39,7 @@ class TestLooker(unittest.TestCase):
             "delta": "delta",
             "DNE": f"ABSOLUTELY_INVALID_ELT_TYPE_{secrets.token_urlsafe(16)}",
         }
+        self.fake_table = Table(name=self.fake_table_name)
         self.fake_headers = {
             "authorization": "Bearer fake_access_token",
             "cache-control": "no-cache",
@@ -196,12 +198,10 @@ class TestLooker(unittest.TestCase):
         mock_get_data.return_value = []
         mock_login.return_value = self.fake_headers
 
-        self.lk.get_data(table=self.fake_table_name, elt_type=self.elt_type["full"])
+        self.lk.get_data(self.fake_table, None, None)
 
         mock_login.assert_called()
-        mock_get_data.assert_called_with(
-            self.fake_headers, self.fake_table_name, self.elt_type["full"], None, None
-        )
+        mock_get_data.assert_called_with(self.fake_headers, self.fake_table, None, None)
 
     @pytest.mark.unit_test
     @mock.patch("looker.get_data.Looker.looker_login")
@@ -215,8 +215,7 @@ class TestLooker(unittest.TestCase):
         mock_login.return_value = self.fake_headers
 
         self.lk.get_data(
-            table=self.fake_table_name,
-            elt_type=self.elt_type["full"],
+            table=self.fake_table,
             last_run_timestamp=self.last_run_timestamp,
             current_timestamp=self.current_timestamp,
         )
@@ -224,8 +223,7 @@ class TestLooker(unittest.TestCase):
         mock_login.assert_called()
         mock_get_data.assert_called_with(
             self.fake_headers,
-            self.fake_table_name,
-            self.elt_type["full"],
+            self.fake_table,
             self.last_run_timestamp,
             self.current_timestamp,
         )
@@ -237,10 +235,11 @@ class TestLooker(unittest.TestCase):
     ):
         mock_get_data_payload.return_value = dict({"foo": "bar"})
 
+        t = Table(name=self.fake_table_name, elt_type=self.elt_type["DNE"])
+
         with self.assertRaises(Exception, msg="Invalid elt_type in tables.yaml file"):
             self.lk.looker_get_data(
-                table=self.fake_table_name,
-                elt_type=self.elt_type["DNE"],
+                self.fake_table,
             )
 
     @pytest.mark.unit_test
@@ -249,15 +248,14 @@ class TestLooker(unittest.TestCase):
     def test_when_passing_full_elt_type_then_set_payload_filters_value_to_None(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk._Looker__base_url}/queries/run/json"
+        table = Table(name=self.fake_table_name, elt_type=self.elt_type["full"])
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict({"foo": "bar", "filters": "bar"})
         mock_get_data_payload.return_value = fake_data_payload
 
         self.lk.looker_get_data(
             headers=self.fake_headers,
-            table=self.fake_table_name,
-            elt_type=self.elt_type["full"],
+            table=table,
         )
 
         self.assertDictEqual(fake_data_payload, dict({"foo": "bar", "filters": None}))
@@ -268,12 +266,12 @@ class TestLooker(unittest.TestCase):
     def test_when_passing_delta_elt_type_then_call_format_looker_and_change_field_name(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk._Looker__base_url}/queries/run/json"
+        table = Table(name=self.fake_table_name, elt_type=self.elt_type["delta"])
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict(
             {
                 "foo": "bar",
-                "filters": {f"{self.fake_table_name}.created_time": "fake_time"},
+                "filters": {f"{table.name}.created_time": "fake_time"},
             }
         )
 
@@ -282,8 +280,7 @@ class TestLooker(unittest.TestCase):
 
         self.lk.looker_get_data(
             headers=self.fake_headers,
-            table=self.fake_table_name,
-            elt_type=self.elt_type["delta"],
+            table=table,
             last_run_timestamp=self.last_run_timestamp,
             current_timestamp=self.current_timestamp,
         )
@@ -294,7 +291,7 @@ class TestLooker(unittest.TestCase):
                 {
                     "foo": "bar",
                     "filters": {
-                        f"{self.fake_table_name}.created_time": expected_created_time
+                        f"{self.fake_table}.created_time": expected_created_time
                     },
                 }
             ),
@@ -312,12 +309,12 @@ class TestLooker(unittest.TestCase):
     def test_when_calling_looker_get_data_then_expect_result_to_be_a_json_array(
         self, mock_get_data_payload, mock_requests_post
     ):
-        url = f"{self.lk._Looker__base_url}/queries/run/json"
+        table = Table(name=self.fake_table_name, elt_type=self.elt_type["delta"])
         mock_requests_post.side_effect = mock_post_request
         fake_data_payload = dict(
             {
                 "foo": "bar",
-                "filters": {f"{self.fake_table_name}.created_time": "fake_time"},
+                "filters": {f"{table.name}.created_time": "fake_time"},
             }
         )
 
@@ -325,8 +322,7 @@ class TestLooker(unittest.TestCase):
 
         data = self.lk.looker_get_data(
             headers=self.fake_headers,
-            table=self.fake_table_name,
-            elt_type=self.elt_type["delta"],
+            table=table,
             last_run_timestamp=self.last_run_timestamp,
             current_timestamp=self.current_timestamp,
         )

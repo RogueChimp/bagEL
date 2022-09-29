@@ -5,23 +5,21 @@ from typing import Dict, List, Optional, Union
 @dataclass(eq=True, frozen=True)
 class Bite:
 
-    content: Union[bytes, List[Dict]]
+    data: Union[bytes, List[Dict]]
     file_name: Optional[str] = None
 
     def __post_init__(self):
-        self._validate_content(self.content)
+        self._validate_content(self.data)
 
     @staticmethod
-    def _validate_content(content):
+    def _validate_content(data):
 
-        if not (isinstance(content, bytes) or isinstance(content, list)):
+        if not (isinstance(data, bytes) or isinstance(data, list)):
             raise TypeError(
-                f"Datapoint needs to be of type bytes or list. Not {type(content)}"
+                f"Datapoint needs to be of type bytes or list. Not {type(data)}"
             )
 
-        if (
-            isinstance(content, list)
-            and len(content) > 0
-            and isinstance(content[0], list)
-        ):
-            raise TypeError("Cannot be list of lists. Use pagination/generator.")
+        if isinstance(data, list) and len(data) > 0 and not isinstance(data[0], dict):
+            raise TypeError(
+                "Bite data must be bytes or a list of dicts. If returning list of lists, use pagination/generator instead."
+            )

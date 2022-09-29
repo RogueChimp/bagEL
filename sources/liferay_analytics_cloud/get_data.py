@@ -3,7 +3,7 @@ import requests
 import logging
 import time
 import json
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,25 +13,26 @@ logging.basicConfig(
 
 class LiferayAnalyticsCloud(BagelIntegration):
 
-    name = "liferay_analytics_cloud"
+    source = "liferay_analytics_cloud"
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self._load_config()
         self.base_url = "http://analytics.liferay.com/api/reports/export/"
 
     def _load_config(self):
         self.__auth_secret = os.getenv("LIFERAY_ANALYTICS_CLOUD_TOKEN")
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
+        table_name = table.name
         self.url = self.liferay_analytics_cloud_get_url(
-            table, kwargs["last_run_timestamp"], kwargs["current_timestamp"]
+            table_name, last_run_timestamp, current_timestamp
         )
         self.file_status = "PENDING"
         data = self.liferay_analytics_cloud_get_data(self.file_status, self.url)
         return Bite(data)
 
     def liferay_analytics_cloud_get_url(
-        self, table, last_run_timestamp, current_timestamp
+        self, table_name, last_run_timestamp, current_timestamp
     ):
         last_run_timestamp = (
             last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
@@ -41,7 +42,7 @@ class LiferayAnalyticsCloud(BagelIntegration):
         )
         since = f"fromDate={last_run_timestamp}"
         until = f"toDate={current_timestamp}"
-        url = f"{self.base_url}{table}?{since}&{until}"
+        url = f"{self.base_url}{table_name}?{since}&{until}"
         return url
 
     def liferay_analytics_cloud_get_data(self, file_status, url):

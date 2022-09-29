@@ -2,7 +2,7 @@ import os
 import logging
 import requests
 
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -12,13 +12,13 @@ logging.basicConfig(
 
 class Aha(BagelIntegration):
 
-    name = "aha"
+    source = "aha"
 
     ##############
     # Initialize #
     ##############
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self.base_url = "https://trimedx-solutions.aha.io/api/v1/"
 
     ###########################
@@ -28,7 +28,6 @@ class Aha(BagelIntegration):
     def aha_get_url(
         self, table, last_run_timestamp, idea_id=1, page=1, idea_list=False
     ):
-
         IDEAS = "ideas"
         last_run_timestamp = last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fz")
         updated_since = f"updated_since={last_run_timestamp}"
@@ -83,7 +82,7 @@ class Aha(BagelIntegration):
     # MAIN #
     ########
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
 
         # initialize variables
         ZERO = 0
@@ -96,8 +95,9 @@ class Aha(BagelIntegration):
         #
 
         # get first URL
+        table_name = table.name
         self.next_url = self.aha_get_url(
-            table, kwargs["last_run_timestamp"], page=current_page, idea_list=True
+            table_name, last_run_timestamp, page=current_page, idea_list=True
         )
 
         # while there is another page
@@ -106,7 +106,7 @@ class Aha(BagelIntegration):
             # set total pages expected
             # start building idea_ids to pass to "endorsements"
             data, total_pages = self.aha_api_call(
-                table, self.next_url, self.header, idea_list=True
+                table_name, self.next_url, self.header, idea_list=True
             )
 
             # add idea ids to list if applicable
@@ -118,8 +118,8 @@ class Aha(BagelIntegration):
             if current_page < total_pages:
                 current_page += 1
                 self.next_url = self.aha_get_url(
-                    table,
-                    kwargs["last_run_timestamp"],
+                    table_name,
+                    last_run_timestamp,
                     page=current_page,
                     idea_list=True,
                 )
@@ -138,7 +138,7 @@ class Aha(BagelIntegration):
 
             # get first URL
             self.next_url = self.aha_get_url(
-                table, kwargs["last_run_timestamp"], idea_ids[ZERO], current_page
+                table_name, last_run_timestamp, idea_ids[ZERO], current_page
             )
 
             # while there is another page
@@ -146,15 +146,17 @@ class Aha(BagelIntegration):
 
                 # return data to azure
                 # set total pages expected for table
-                data, total_pages = self.aha_api_call(table, self.next_url, self.header)
+                data, total_pages = self.aha_api_call(
+                    table_name, self.next_url, self.header
+                )
                 yield Bite(data)
 
                 # if this isn't the final page, get the URL set for the next page and repeat the while loop
                 if current_page < total_pages:
                     current_page += 1
                     self.next_url = self.aha_get_url(
-                        table,
-                        kwargs["last_run_timestamp"],
+                        table_name,
+                        last_run_timestamp,
                         idea_ids[ZERO],
                         current_page,
                     )

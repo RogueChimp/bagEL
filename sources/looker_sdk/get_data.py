@@ -1,6 +1,6 @@
 import looker_sdk
 import logging
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -10,28 +10,28 @@ logging.basicConfig(
 
 class Looker_SDK(BagelIntegration):
 
-    name = "looker_sdk"
+    source = "looker_sdk"
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self._load_config()
 
     def _load_config(self):
         self.sdk = looker_sdk.init40()
         return self.sdk
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
         """`hasattr()` and `getattr()` are used here to dynamically call
         the corresponding function to the formatted table name."""
 
-        return getattr(self, table)(table, **kwargs)
+        return getattr(self, table.name)(table, last_run_timestamp, current_timestamp)
 
-    def all_users(self, table, **kwargs):
+    def all_users(self, *args, **kwargs):
         """gets all user's data"""
         all_users = self.sdk.all_users()
         for user in all_users:
             yield Bite([user.__dict__])
 
-    def user_attributes(self, table, **kwargs):
+    def user_attributes(self, *args, **kwargs):
         """gets all users, then loops through each user getting their attributes."""
         all_users = self.sdk.all_users()
         for user in all_users:

@@ -3,7 +3,7 @@ import requests
 import json
 import datetime
 import logging
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,9 +13,9 @@ logging.basicConfig(
 
 class Looker(BagelIntegration):
 
-    name = "looker"
+    source = "looker"
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self._load_config()
 
     def _load_config(self):
@@ -28,18 +28,15 @@ class Looker(BagelIntegration):
         self.__client_id = os.getenv("LOOKER_CLIENT_ID")
         self.__client_secret = os.getenv("LOOKER_CLIENT_SECRET")
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
+
         headers = self.looker_login()
         data = self.looker_get_data(
-            headers,
-            table,
-            kwargs.get("elt_type", "full"),
-            kwargs.get("last_run_timestamp", None),
-            kwargs.get("current_timestamp", None),
+            headers, table, last_run_timestamp, current_timestamp
         )
         return Bite(data)
 
-    def get_data_payload(self, table: str):
+    def get_data_payload(self, table_name: str):
         """
         Don't know what os this can run on, but we assume the same file structure, e.g.
         this file sits in the same directory as the queries.
@@ -52,7 +49,7 @@ class Looker(BagelIntegration):
                 [
                     os.path.dirname(os.path.realpath(__file__)),
                     "queries",
-                    table + ".json",
+                    table_name + ".json",
                 ]
             ),
             "r",
@@ -74,15 +71,16 @@ class Looker(BagelIntegration):
     def looker_get_data(
         self,
         headers,
-        table,
-        elt_type="full",
+        table: Table,
         last_run_timestamp=None,
         current_timestamp=None,
     ):
+
         query_url = f"{self.__base_url}/queries/run/json"
-        data_payload = self.get_data_payload(table)
         logging.info(f"table: {table}")
-        logging.info(f"elt_type: {elt_type}")
+
+        data_payload = self.get_data_payload(table.name)
+        elt_type = table.elt_type
 
         if elt_type == "full":
             data_payload["filters"] = None

@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import requests
 import logging
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,10 +12,10 @@ logging.basicConfig(
 
 class ETQDocuments(BagelIntegration):
 
-    name = "etq"
+    source = "etq"
     page_size = 2000
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self._load_config()
 
     def _load_config(self):
@@ -24,30 +24,34 @@ class ETQDocuments(BagelIntegration):
         self._env = os.getenv("ETQ_ENV", "dev")
         self.base_url = f"https://trimedx.etq.com:8443/{self._env}/rest/v1/"
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
         """`hasattr()` and `getattr()` are used here to dynamically call
         the corresponding function to the formatted table name if there is one.
         Otherwise `_get_datasource()` is called."""
 
-        if hasattr(self, table):
-            return getattr(self, table)(table, **kwargs)
+        if hasattr(self, table.name):
+            return getattr(self, table.name)(
+                table, last_run_timestamp, current_timestamp
+            )
 
         else:
-            return self._get_datasource(table, **kwargs)
+            return self._get_datasource(table, last_run_timestamp, current_timestamp)
 
-    def _docwork_closed_bynumber(self, table, **kwargs):
-        docword_records_raw = self._get_datasource(table)
+    def _docwork_closed_bynumber(self, table, last_run_timestamp, current_timestamp):
+        docword_records_raw = self._get_datasource(
+            table, last_run_timestamp, current_timestamp
+        )
         for records in docword_records_raw:
 
             to_send = []
-            for record in records.content:
+            for record in records.data:
 
-                elt_type = kwargs.get("elt_type")
+                elt_type = table.elt_type
                 if elt_type and elt_type == "delta":
                     modified_date = datetime.strptime(
                         record["DOCWOR_DOCUMEN_ETQ$MODIFIE_DAT"], "%Y-%m-%d %H:%M:%S.%f"
                     )
-                    lr_t: datetime = kwargs["last_run_timestamp"]
+                    lr_t: datetime = last_run_timestamp
                     if modified_date.timestamp() <= lr_t.timestamp():
                         continue
 
@@ -55,15 +59,21 @@ class ETQDocuments(BagelIntegration):
 
             yield to_send
 
-    def docwork_closed_bynumber(self, table, **kwargs):
-        for r in self._docwork_closed_bynumber(table, **kwargs):
+    def docwork_closed_bynumber(self, table, last_run_timestamp, current_timestamp):
+        for r in self._docwork_closed_bynumber(
+            table, last_run_timestamp, current_timestamp
+        ):
             yield Bite(r)
 
-    def _docwork_document(self, **kwargs):
+    def _docwork_document(self, table: Table, last_run_timestamp, current_timestamp):
 
         docwork_records = []
 
-        for d in self._docwork_closed_bynumber("docwork_closed_bynumber", **kwargs):
+        t = Table(name="docwork_closed_bynumber", elt_type=table.elt_type)
+
+        for d in self._docwork_closed_bynumber(
+            t, last_run_timestamp, current_timestamp
+        ):
             docwork_records += d
 
         docs = []
@@ -82,12 +92,16 @@ class ETQDocuments(BagelIntegration):
 
         return docs
 
-    def docwork_document(self, table, **kwargs):
-        return Bite(self._docwork_document(**kwargs))
+    def docwork_document(self, table, last_run_timestamp, current_timestamp):
+        return Bite(
+            self._docwork_document(table, last_run_timestamp, current_timestamp)
+        )
 
-    def docwork_attachment(self, table, **kwargs):
+    def docwork_attachment(self, table, last_run_timestamp, current_timestamp):
 
-        for data in self._docwork_document(**kwargs):
+        for data in self._docwork_document(
+            table, last_run_timestamp, current_timestamp
+        ):
             document = data["Document"][0]
             fields = document["Fields"]
             attachment = [f for f in fields if f["fieldName"] == "DOCWORK_ATTACHMENTS"][
@@ -119,13 +133,14 @@ class ETQDocuments(BagelIntegration):
 
             yield Bite(file_content, file_name=document_id)
 
-    def _get_datasource(self, table: str, **kwargs):
+    def _get_datasource(self, table: Table, last_run_timestamp, current_timestamp):
+        table_name = table.name
 
         page = 1
         while True:
             datasource_url = (
                 self.base_url
-                + f"datasources/{table}/execute?pagesize={self.page_size}&pagenumber={page}"
+                + f"datasources/{table_name}/execute?pagesize={self.page_size}&pagenumber={page}"
             )
             logging.info(f"{datasource_url = }")
             response = requests.get(
@@ -133,7 +148,9 @@ class ETQDocuments(BagelIntegration):
             )
 
             if response.status_code != 200:
-                raise RuntimeError(f"{response.status_code = }\n{response.text}")
+                raise RuntimeError(
+                    f"ERROR running {datasource_url}\n{response.status_code = }\n{response.text}"
+                )
 
             d = response.json()
 

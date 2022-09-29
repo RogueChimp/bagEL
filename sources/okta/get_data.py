@@ -5,7 +5,7 @@ import logging
 import pendulum
 import requests
 
-from bagel import Bagel, BagelIntegration, Bite
+from bagel import Bagel, BagelIntegration, Bite, Table
 
 
 logging.basicConfig(
@@ -16,19 +16,21 @@ logging.basicConfig(
 
 class Okta(BagelIntegration):
 
-    name = "okta"
+    source = "okta"
 
-    def __init__(self) -> None:
+    def __post_init__(self) -> None:
         self._load_config()
         self.base_url = "https://trimedxext.okta.com/api/v1/"
 
     def _load_config(self):
         self._auth_secret = os.getenv("OKTA_SECRET")
 
-    def get_data(self, table: str, **kwargs):
+    def get_data(self, table: Table, last_run_timestamp, current_timestamp):
+
+        table_name = table.name
 
         self.next_url = self.okta_get_url(
-            table, kwargs["last_run_timestamp"], kwargs["current_timestamp"]
+            table_name, last_run_timestamp, current_timestamp
         )
         rate_limit = -1
         while self.next_url:
@@ -44,12 +46,12 @@ class Okta(BagelIntegration):
             yield Bite(data)
         return None
 
-    def okta_get_url(self, table, last_run_timestamp, current_timestamp):
+    def okta_get_url(self, table_name, last_run_timestamp, current_timestamp):
         last_run_timestamp = last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fz")
         current_timestamp = current_timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fz")
         since = f"since={last_run_timestamp}"
         until = f"until={current_timestamp}"
-        url = f"{self.base_url}{table}?{since}&{until}&limit=1000"
+        url = f"{self.base_url}{table_name}?{since}&{until}&limit=1000"
         return url
 
     def okta_get_data(self, url):

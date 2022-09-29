@@ -1,4 +1,5 @@
 from bagel.data import Bite
+from bagel.table import Table
 import pytest
 import unittest
 from unittest import mock
@@ -43,7 +44,7 @@ class TestETQ(unittest.TestCase):
 
         mock_docwork_closed_bynumber.return_value = expected
 
-        result = self.etq.get_data("docwork_closed_bynumber")
+        result = self.etq.get_data(Table("docwork_closed_bynumber", "etq"), None, None)
 
         assert result == expected
 
@@ -56,7 +57,7 @@ class TestETQ(unittest.TestCase):
 
         mock__get_datasource.return_value = expected
 
-        result = self.etq.get_data("bar")
+        result = self.etq.get_data(Table("bar", "baz"), None, None)
 
         assert result == expected
 
@@ -90,7 +91,7 @@ class TestETQ(unittest.TestCase):
             mock_get_request(json_data={"count": 0}),
         ]
 
-        result = self.etq.get_data("bar")
+        result = self.etq.get_data(Table("bar", "baz"), None, None)
 
         assert result.__next__() == expected
         with self.assertRaises(StopIteration):
@@ -103,7 +104,7 @@ class TestETQ(unittest.TestCase):
         mock_requests_get.return_value = mock_get_request(status_code=404)
 
         with self.assertRaises(RuntimeError):
-            self.etq.get_data("foo").__next__()
+            self.etq.get_data(Table("bar", "baz"), None, None).__next__()
 
     @pytest.mark.unit_test
     @mock.patch("etq.get_data.requests.get")
@@ -245,6 +246,6 @@ class TestETQ(unittest.TestCase):
         mock_requests_get.return_value = mock_get_request(content=bytes("foo", "utf-8"))
 
         expected = 1
-        result = len(list(self.etq.docwork_attachment("asdf")))
+        result = len(list(self.etq.docwork_attachment(Table("asdf"), None, None)))
 
         assert result == expected
