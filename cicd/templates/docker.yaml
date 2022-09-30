@@ -1,18 +1,6 @@
 parameters:
-  - name: command
-    type: string
-    default: 'build'
-    values:
-    - build
-    - push
-  - name: repository
-    type: string
-  - name: dockerfile
-    type: string
   - name: containerRegistry
     type: string
-  - name: container_sources
-    type: object
 
 steps:
   - task: Docker@2
@@ -20,22 +8,9 @@ steps:
     inputs:
       command: login
       containerRegistry: ${{ parameters.containerRegistry }}
-  - ${{ each src in parameters.container_sources }}:
-    - task: Docker@2
-      displayName: docker_build_${{ src }}
-      inputs:
-        command: build
-        dockerfile: ${{ parameters.dockerfile }}
-        repository: ${{ src }}
-        arguments: "--build-arg SRC=${{ src }}"
-        tags: |
-          $(Build.BuildId)
-    - ${{ if eq(parameters.command,'push') }}:
-      - task: Docker@2
-        displayName: acr_push_${{ src }}
-        inputs:
-          command: push
-          repository: ${{ src }}
-          containerRegistry: ${{ parameters.containerRegistry }}
-          tags: |
-            $(Build.BuildId)
+  - script: |
+      cicd/scripts/docker_build_push.sh $PWD $BUILD_BUILDID
+    displayName: build and push updated images
+    env:
+      TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+      SOURCE_BRANCH: $(System.PullRequest.SourceBranch)

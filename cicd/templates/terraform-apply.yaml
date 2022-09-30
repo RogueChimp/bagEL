@@ -1,4 +1,9 @@
 steps:
+  - script: |
+      cicd/scripts/specify_terraform_targets.sh
+    displayName: specify terraform targets
+    condition: contains('${{ parameters.workingDirectory }}', 'terraform-aci')
+
   - task: TerraformTaskV2@2
     displayName: 'terraform init'
     inputs:
@@ -16,6 +21,17 @@ steps:
     inputs:
       provider: 'azurerm' 
       command: 'apply'
+      commandOptions: '-var build_id=$(Build.BuildId) $(TARGETS) -input=false -auto-approve -var-file="../tfvars/${{ parameters.environment }}/${{ parameters.environment }}.tfvars"'
+      environmentServiceNameAzureRM: '${{ parameters.backendServiceArm }}'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+    condition: and(contains('${{ parameters.workingDirectory }}', 'terraform-aci'), ne(variables.TARGETS, ''))
+
+  - task: TerraformTaskV2@2
+    displayName: 'terraform apply'
+    inputs:
+      provider: 'azurerm' 
+      command: 'apply'
       commandOptions: '-var build_id=$(Build.BuildId) -input=false -auto-approve -var-file="../tfvars/${{ parameters.environment }}/${{ parameters.environment }}.tfvars"'
       environmentServiceNameAzureRM: '${{ parameters.backendServiceArm }}'
       workingDirectory: '${{ parameters.workingDirectory }}'
+    condition: not(contains('${{ parameters.workingDirectory }}', 'terraform-aci'))

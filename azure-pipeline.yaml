@@ -43,6 +43,14 @@ steps:
         repoType: ado
         serviceCxn: devops-TMXSBX-Integrations
 
+    - script: |
+        TARGET_BRANCH=$(grep -Eo '[^/]+$' <<<$TARGET_BRANCH)
+        SOURCE_BRANCH=$(grep -Eo '[^/]+$' <<<$SOURCE_BRANCH)
+        cp .git/refs/remotes/origin/{$TARGET_BRANCH,$SOURCE_BRANCH} .git/refs/heads/
+      env:
+        TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+        SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
+      displayName: populate .git/refs/heads/
     - task: UsePythonVersion@0
       displayName: 'Use Python 3.8'
       inputs:
@@ -50,7 +58,7 @@ steps:
 
     - script: pip install black && black . --check
       displayName: Black formatting/linting
-      
+
     - script: pip install pytest pytest-cov
       displayName: Install pytest
 
@@ -67,46 +75,36 @@ steps:
         filePath: run-tests.sh
       displayName: pytest
   
-  - task: qetza.replacetokens.replacetokens-task.replacetokens@3
-    displayName: 'Replace Tokens'
-    inputs:
-      rootDirectory: '$(Build.SourcesDirectory)/cicd/tfvars/$(env)'
-      targetFiles: '**/**'
-      enableTelemetry: false
-      actionOnMissing: continue
+    - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+      displayName: 'Replace Tokens'
+      inputs:
+        rootDirectory: '$(Build.SourcesDirectory)/cicd/tfvars/$(env)'
+        targetFiles: '**/**'
+        enableTelemetry: false
+        actionOnMissing: continue
 
-  - template: cicd/templates/terraform-apply.yaml
-    parameters:
-      backendServiceArm: '${{ variables.backendServiceArm }}'
-      backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
-      backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
-      backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
-      backendAzureRmKey: '${{ variables.backendAzureRmKey }}' 
-      workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform/'
-      environment: ${{ variables.environment }}
-      terraform_version: ${{ variables.terraform_version }}
+    - template: cicd/templates/terraform-apply.yaml
+      parameters:
+        backendServiceArm: '${{ variables.backendServiceArm }}'
+        backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+        backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+        backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+        backendAzureRmKey: '${{ variables.backendAzureRmKey }}' 
+        workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform/'
+        environment: ${{ variables.environment }}
+        terraform_version: ${{ variables.terraform_version }}
 
-  - template: cicd/templates/docker.yaml
-    parameters:
-      repository: ${{ variables.repository }}
-      dockerfile: ${{ variables.dockerfile }}
-      containerRegistry: ${{ variables.containerRegistry }}
-      command: 'push'
-      container_sources: 
-        - okta
-        - looker
-        - looker_sdk
-        - etq
-        - aha
-        #- liferay_analytics_cloud
+    - template: cicd/templates/docker.yaml
+      parameters:
+        containerRegistry: ${{ variables.containerRegistry }}
 
-  - template: cicd/templates/terraform-apply.yaml
-    parameters:
-       backendServiceArm: '${{ variables.backendServiceArm }}'
-       backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
-       backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
-       backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
-       backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
-       workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
-       environment: ${{ variables.environment }}
-       terraform_version: ${{ variables.terraform_version }}
+    - template: cicd/templates/terraform-apply.yaml
+      parameters:
+         backendServiceArm: '${{ variables.backendServiceArm }}'
+         backendAzureRmResourceGroupName: '${{ variables.backendAzureRmResourceGroupName }}'
+         backendAzureRmStorageAccountName: '${{ variables.backendAzureRmStorageAccountName }}'
+         backendAzureRmContainerName: '${{ variables.backendAzureRmContainerName }}'
+         backendAzureRmKey: '${{ variables.backendAzureRmKeyAci }}' 
+         workingDirectory: '$(System.DefaultWorkingDirectory)/cicd/terraform-aci/'
+         environment: ${{ variables.environment }}
+         terraform_version: ${{ variables.terraform_version }}
