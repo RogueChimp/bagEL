@@ -43,14 +43,15 @@ steps:
         repoType: ado
         serviceCxn: devops-TMXSBX-Integrations
 
-  - script: |
-      TARGET_BRANCH=$(grep -Eo '[^/]+$' <<<$TARGET_BRANCH)
-      SOURCE_BRANCH=$(grep -Eo '[^/]+$' <<<$SOURCE_BRANCH)
-      cp .git/refs/remotes/origin/{$TARGET_BRANCH,$SOURCE_BRANCH} .git/refs/heads/
-    env:
-      TARGET_BRANCH: $(System.PullRequest.TargetBranch)
-      SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
-    displayName: populate .git/refs/heads/
+    - script: |
+        TARGET_BRANCH=$(grep -Eo '[^/]+$' <<<$TARGET_BRANCH)
+        SOURCE_BRANCH=$(grep -Eo '[^/]+$' <<<$SOURCE_BRANCH)
+        cp .git/refs/remotes/origin/{$TARGET_BRANCH,$SOURCE_BRANCH} .git/refs/heads/
+        echo "##vso[task.setvariable variable=IS_PR]true"
+      env:
+        TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+        SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
+      displayName: populate .git/refs/heads/
 
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.8'

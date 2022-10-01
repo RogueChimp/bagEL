@@ -8,7 +8,12 @@ DOCKERFILE_DIR=$1
 TAG=$2
 
 #check for updated sources
-SRCS=$(git diff $TARGET_BRANCH...$SOURCE_BRANCH --name-only | grep -i sources/ | sed -r 's/sources\/|\/.+//g' | sort | uniq)
+if [[ $IS_PR != "" ]]
+then
+  SRCS=$(git diff $TARGET_BRANCH...$SOURCE_BRANCH --name-only | grep -i sources/ | sed -r 's/sources\/|\/.+//g' | sort | uniq)
+else
+  SRCS=$(git log -n 1 --name-only | grep -i sources/ | sed -r 's/sources\/|\/.+//g' | sort | uniq)
+fi
 
 printf "=======\nupdated sources:$(wc -l <<<$SRCS)\n$SRCS\n=======\n"
 
