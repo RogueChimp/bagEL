@@ -180,47 +180,46 @@ resource "azurerm_container_group" "aha_cg" {
   }
 }
 
-# resource "azurerm_container_group" "etq_cg" {
-#   name                = var.etq_container_group_name
+
 #liferay analytics cloud
-# resource "azurerm_container_group" "liferay_analytics_cloud_cg" {
-#   name                = var.liferay_analytics_cloud_container_group_name 
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   location            = data.azurerm_resource_group.rg.location
-#   os_type             = "Linux"
-#   restart_policy      = "Never"
+resource "azurerm_container_group" "liferay_analytics_cloud_cg" {
+  name                = var.liferay_analytics_cloud_container_group_name 
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  restart_policy      = "Never"
 
-#   image_registry_credential {
-#     username = data.azurerm_container_registry.acr.admin_username
-#     password = data.azurerm_container_registry.acr.admin_password
-#     server   = data.azurerm_container_registry.acr.login_server
-#   }
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
 
-#   container {
-#     name   = "liferay-analytics-cloud"
-#     image  = "${data.azurerm_container_registry.acr.login_server}/liferay_analytics_cloud:${var.build_id}"
-#     cpu    = "0.5"
-#     memory = "1.5"
+  container {
+    name   = "liferay-analytics-cloud"
+    image  = "${data.azurerm_container_registry.acr.login_server}/liferay_analytics_cloud:${var.build_id}"
+    cpu    = "0.5"
+    memory = "1.5"
  
-#     environment_variables = {
-#       AZURE_CONTAINER = var.azure_container
-#       AZURE_TABLE = var.azure_table
-#       STORAGE_ACCOUNT = var.storage_account
-#       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
-#     }
+    environment_variables = {
+      AZURE_CONTAINER = var.azure_container
+      AZURE_TABLE = var.azure_table
+      STORAGE_ACCOUNT = var.storage_account
+      STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+    }
 
-#     secure_environment_variables =  {
-#       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
-#       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
-#       LIFERAY_ANALYTICS_CLOUD_TOKEN = var.liferay_analytics_cloud_token
-#     }
+    secure_environment_variables =  {
+      STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      LIFERAY_ANALYTICS_CLOUD_TOKEN = var.liferay_analytics_cloud_token
+    }
 
-#     ports {
-#           port     = 443
-#           protocol = "TCP"
-#     }
-#   }
-# }
+    ports {
+          port     = 443
+          protocol = "TCP"
+    }
+  }
+}
 
 resource "azurerm_container_group" "etq_cg" {
   name                = var.etq_container_group_name

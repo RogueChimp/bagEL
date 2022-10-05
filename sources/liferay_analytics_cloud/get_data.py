@@ -47,9 +47,7 @@ class LiferayAnalyticsCloud(BagelIntegration):
 
     def liferay_analytics_cloud_get_data(self, file_status, url):
         logging.info(f"url: {url}")
-        query = {
-            "Authorization": f"Bearer {self.__auth_secret}",
-        }
+        query = {"Authorization": f"Bearer {self.__auth_secret}", "User-Agent": "bagEL"}
         while file_status == "PENDING":
             data = []
             logging.info(f"...looking for file")
