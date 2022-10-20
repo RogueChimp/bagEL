@@ -27,4 +27,6 @@ etq_container_group_name = "ci-np-tmx-nc-bageletq"
 etq_user = "#{ETQ_USER}#"
 etq_password = "#{ETQ-SECRET}#"
 etq_env = "val"
+national_vulnerability_database_container_group_name = "ci-np-tmx-nc-bagelnationalvulnerabilitydatabase"
+national_vulnerability_database_secret = "#{national_vulnerability_database_secret}#"
 env = np

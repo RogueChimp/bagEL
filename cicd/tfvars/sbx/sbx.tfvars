@@ -27,4 +27,6 @@ liferay_analytics_cloud_container_group_name = "ci-sbox-tmx-nc-bagelliferayanaly
 liferay_analytics_cloud_token = "#{LIFERAY-ANALYTICS-CLOUD-TOKEN}#"
 aha_container_group_name = "ci-sbox-tmx-nc-bagelaha"
 aha_token = "#{AHA-TOKEN}#"
+national_vulnerability_database_container_group_name = "ci-sbox-tmx-nc-bagelnationalvulnerabilitydatabase"
+national_vulnerability_database_secret = "#{national_vulnerability_database_secret}#"
 env = sbox

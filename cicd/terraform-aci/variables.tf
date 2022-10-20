@@ -140,3 +140,11 @@ variable "looker_sdk_container_group_name" {
   type        = string
   description = "looker sdk container group name"
 }
+variable "national_vulnerability_database_secret" {
+  type        = string
+  description = "NVD API Authorization key"
+}
+variable "national_vulnerability_database_container_group_name" {
+  type        = string
+  description = "NVD container-group name in Azure"
+}
