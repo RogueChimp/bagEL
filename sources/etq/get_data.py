@@ -21,7 +21,7 @@ class ETQDocuments(BagelIntegration):
     def _load_config(self):
         self._etq_user = os.getenv("ETQ_USER")
         self._etq_password = os.getenv("ETQ_PASSWORD")
-        self._env = os.getenv("ETQ_ENV", "dev")
+        self._env = os.getenv("ETQ_ENV")
         self.base_url = f"https://trimedx.etq.com:8443/{self._env}/rest/v1/"
 
     def get_data(self, table: Table, last_run_timestamp, current_timestamp):

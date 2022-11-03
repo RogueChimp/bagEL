@@ -103,6 +103,11 @@ variable "etq_password" {
   description = "ETQ authentication password"
 }
 
+variable "etq_env" {
+  type        = string
+  description = "ETQ env"
+}
+
 variable "aha_container_group_name" {
   type        = string
   description = "Aha! container-group name in Azure"
