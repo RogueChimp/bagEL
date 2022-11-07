@@ -3,6 +3,9 @@
   "view": "history",
   "fields": [
     "history.id",
+    "dashboard.id",
+    "query.id",
+    "user.id",
     "history.created_time",
     "history.cache",
     "history.cache_key",
@@ -29,7 +32,9 @@
     "history.source",
     "history.issuer_source",
     "history.status",
-    "history.workspace_id"
+    "history.workspace_id",
+    "history.most_recent_query_date",
+    "history.average_runtime"
   ],
   "filters": {
     "history.created_time": "$(FROM) to $(TO)"

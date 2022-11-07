@@ -1,0 +1,35 @@
+{
+    "model": "system__activity",
+    "view": "scheduled_plan",
+    "fields": [
+        "scheduled_plan.next_run_time",
+        "scheduled_plan_destination.id",
+        "scheduled_plan.id",
+        "dashboard.id",
+        "scheduled_plan.created_time",
+        "scheduled_plan.enabled",
+        "scheduled_plan.filters_string",
+        "scheduled_plan.id",
+        "scheduled_plan.name",
+        "scheduled_plan.next_run_time",
+        "scheduled_plan.requirements",
+        "scheduled_plan.query_id",
+        "scheduled_plan.content_link",
+        "scheduled_plan.content_type_id",
+        "scheduled_plan.dashboard_id",
+        "scheduled_plan.space_link",
+        "scheduled_plan.look_id",
+        "scheduled_plan.lookml_dashboard_id",
+        "scheduled_plan.timezone",
+        "scheduled_plan.cron_schedule",
+        "scheduled_plan.datagroup",
+        "scheduled_plan.updated_time",
+        "scheduled_plan.user_id"
+    ],
+    "filters": {
+        "scheduled_plan.updated_time": "$(FROM) to $(TO)"
+    },
+    "sorts": [
+        "scheduled_job.finalized_time desc"
+    ]
+}

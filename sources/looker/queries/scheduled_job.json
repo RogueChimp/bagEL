@@ -1,0 +1,30 @@
+{
+    "model": "system__activity",
+    "view": "scheduled_plan",
+    "fields": [
+        "scheduled_job.id",
+        "scheduled_plan.id",
+        "dashboard.id",
+        "scheduled_job.query_id",
+        "scheduled_job.user_id",
+        "scheduled_job_rank.content_type_id",
+        "scheduled_job.created_time",
+        "scheduled_job.filters_string",
+        "scheduled_job.finalized_time",
+        "scheduled_job_frequency.frequency_in_seconds",
+        "scheduled_job.name",
+        "scheduled_job.status",
+        "scheduled_job.status_detail",
+        "scheduled_job.timezone",
+        "scheduled_job.datagroup",
+        "scheduled_job.cron_schedule"
+    ],
+    "filters": {
+        "scheduled_job.finalized_time": "$(FROM) to $(TO)",
+        "user.is_disabled": "",
+        "scheduled_job.dashboard_id": "NOT NULL"
+    },
+    "sorts": [
+        "scheduled_job.finalized_time desc"
+    ]
+}

@@ -276,7 +276,7 @@ class TestLooker(unittest.TestCase):
         )
 
         mock_get_data_payload.return_value = fake_data_payload
-        expected_created_time = f"{self.lk._format_to_looker_time(self.last_run_timestamp)} to {self.lk._format_to_looker_time(self.current_timestamp)}"
+        expected_created_time = f"{self.lk._format_to_looker_time(self.lk._set_last_run_time(self.last_run_timestamp))} to {self.lk._format_to_looker_time(self.current_timestamp)}"
 
         self.lk.looker_get_data(
             headers=self.fake_headers,
@@ -330,3 +330,25 @@ class TestLooker(unittest.TestCase):
         assert type(data) == list
         for i in data:
             assert type(i) == dict
+
+    @pytest.mark.unit_test
+    def test_when_set_last_run_time_called_with_not_datetime_type_then_raises_exception(
+        self,
+    ):
+        timestamp = str("Fail")
+
+        with self.assertRaises(
+            TypeError,
+            msg="Invalid timestamp type; should be <class 'datetime.datetime'>",
+        ):
+            self.lk._set_last_run_time(timestamp)
+
+    @pytest.mark.unit_test
+    def test_when_set_last_run_time_called_with_datetime_type_then_should_return_formatted_string(
+        self,
+    ):
+        print("&&%#$^#$%^#$%^#$%^")
+        print(str(self.lk._set_last_run_time(self.last_run_timestamp)))
+        assert self.lk._set_last_run_time(self.last_run_timestamp) == datetime.datetime(
+            1111, 1, 1, 0, 46, 1, tzinfo=datetime.timezone.utc
+        )

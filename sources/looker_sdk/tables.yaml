@@ -2,4 +2,8 @@ tables:
   - name: all_users
     elt_type: full 
   - name: user_attributes
-    elt_type: full    
+    elt_type: full
+  - name: all_dashboards
+    elt_type: delta 
+  - name: all_folders
+    elt_type: full

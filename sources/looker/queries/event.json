@@ -1,0 +1,23 @@
+{
+    "model": "system__activity",
+    "view": "event",
+    "fields": [
+        "user.id",
+        "event.id",
+        "event.category",
+        "event.created_time",
+        "event.is_admin",
+        "event.is_api_call",
+        "event.is_looker_employee",
+        "event.name",
+        "event.sudo_user_id"
+    ],
+    "filters": {
+        "event.created_time": "$(FROM) to $(TO)"
+    },
+    "sorts": [
+        "event.category",
+        "event.created_time desc",
+        "user.name"
+    ]
+}

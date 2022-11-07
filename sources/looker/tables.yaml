@@ -1,17 +1,25 @@
 tables:
-  - name: history_dashboard
+  - name: content_usage
+    elt_type: full
+  - name: event
     elt_type: delta
     historical_batch: true
     historical_frequency: D
-  - name: history_history
+  - name: history
     elt_type: delta
     historical_batch: true
     historical_frequency: D
-  - name: history_query
+  - name: query
     elt_type: delta
     historical_batch: true
     historical_frequency: D
-  - name: history_user
+  - name: scheduled_plan_destination
+    elt_type: full
+  - name: scheduled_job
+    elt_type: delta
+    historical_batch: true
+    historical_frequency: D
+  - name: scheduled_plan
     elt_type: delta
     historical_batch: true
     historical_frequency: D

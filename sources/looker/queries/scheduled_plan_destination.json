@@ -1,0 +1,19 @@
+{
+    "model": "system__activity",
+    "view": "scheduled_plan",
+    "fields": [
+        "scheduled_plan_destination.id",
+        "scheduled_plan.id",
+        "dashboard.id",
+        "scheduled_plan_destination.address",
+        "scheduled_plan_destination.action_type",
+        "scheduled_plan_destination.apply_formatting",
+        "scheduled_plan_destination.apply_vis",
+        "scheduled_plan_destination.created_time",
+        "scheduled_plan_destination.message",
+        "scheduled_plan_destination.parameters",
+        "scheduled_plan_destination.type"
+    ],
+    "filters": {},
+    "sorts": []
+}

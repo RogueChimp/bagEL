@@ -1,0 +1,25 @@
+{
+    "model": "system__activity",
+    "view": "content_usage",
+    "fields": [
+        "content_usage.id",
+        "dashboard.id",
+        "content_usage.content_id",
+        "content_usage.content_title",
+        "content_usage.content_type",
+        "content_usage.days_since_last_access_tiers",
+        "content_usage.days_since_last_accessed",
+        "content_usage.last_accessed_time",
+        "content_usage.api_total",
+        "content_usage.embed_total",
+        "content_usage.favorites_total",
+        "content_usage.schedule_total",
+        "content_usage.other_total",
+        "look.moved_to_trash"
+    ],
+    "filters": {},
+    "sorts": [
+        "content_usage.content_type",
+        "dashboard.title"
+    ]
+}

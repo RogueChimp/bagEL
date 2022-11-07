@@ -86,8 +86,10 @@ class Looker(BagelIntegration):
             data_payload["filters"] = None
 
         elif elt_type == "delta":
+            # Subtract 15 minutes from last run time to account for API delay
+            from_timestamp = self._set_last_run_time(last_run_timestamp)
             # Format has to match "YYYY-MM-DD HH:MM:SS"
-            from_time = self._format_to_looker_time(last_run_timestamp)
+            from_time = self._format_to_looker_time(from_timestamp)
             to_time = self._format_to_looker_time(current_timestamp)
 
             # Every single json query has a unique created_time field that matches its table
@@ -112,6 +114,16 @@ class Looker(BagelIntegration):
             # ts = timestamp + datetime.timedelta(seconds=1)
 
             return timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            raise TypeError(
+                "Invalid timestamp type; should be <class 'datetime.datetime'>"
+            )
+
+    def _set_last_run_time(self, timestamp):
+        if isinstance(timestamp, datetime.datetime):
+            # Want to add 15 minutes to the last run timestamp in order to account for a 10 minute latency w/ Looker API
+
+            return timestamp - datetime.timedelta(minutes=15)
         else:
             raise TypeError(
                 "Invalid timestamp type; should be <class 'datetime.datetime'>"

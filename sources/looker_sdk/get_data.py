@@ -1,3 +1,4 @@
+import datetime
 import looker_sdk
 import logging
 from bagel import Bagel, BagelIntegration, Bite, Table
@@ -40,6 +41,26 @@ class Looker_SDK(BagelIntegration):
             for attribute in user_attribtues:
                 user_attribtues_data.append(attribute.__dict__)
             yield Bite(user_attribtues_data)
+
+    def all_dashboards(self, table, last_run_timestamp, current_timestamp):
+        """gets all dashboard data"""
+        all_dashboards = self.sdk.all_dashboards()
+        for dashboardBase in all_dashboards:
+            dashboard = self.sdk.dashboard(dashboard_id=dashboardBase.id)
+            updated_time = dashboard.updated_at or datetime.datetime(
+                2022, 1, 1, tzinfo=datetime.timezone.utc
+            )
+            if (
+                updated_time.timestamp() >= last_run_timestamp.timestamp()
+                and updated_time.timestamp() <= current_timestamp.timestamp()
+            ):
+                yield Bite([dashboard.__dict__])
+
+    def all_folders(self, *args, **kwargs):
+        """gets all folder data"""
+        all_folders = self.sdk.all_folders()
+        for folder in all_folders:
+            yield Bite([folder.__dict__])
 
 
 if __name__ == "__main__":
