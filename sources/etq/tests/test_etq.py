@@ -11,14 +11,17 @@ from .fakes import fake_datasource_data, mock_get_request, mock_get_request
 class TestETQ(unittest.TestCase):
     @mock.patch("etq.get_data.os.getenv")
     def setUp(self, mock_os_getenv) -> None:
-        self.fake_user, self.fake_password, self.env, self.base_url = [
+        self.fake_user, self.fake_password, self.fake_base_url = [
             "FAKE_USER",
             "FAKE_PASSWORD",
-            "dev",
             "https://trimedx.etq.com:8443/dev/rest/v1/",
         ]
 
-        mock_os_getenv.side_effect = [self.fake_user, self.fake_password, self.env]
+        mock_os_getenv.side_effect = [
+            self.fake_user,
+            self.fake_password,
+            self.fake_base_url,
+        ]
 
         self.etq = ETQDocuments()
 
@@ -26,11 +29,10 @@ class TestETQ(unittest.TestCase):
     def test_when_class_instantiated_then_sets_proper_secret_variables_in_load_config_and_base_url(
         self,
     ):
-        expected = [self.fake_user, self.fake_password, self.env, self.base_url]
+        expected = [self.fake_user, self.fake_password, self.fake_base_url]
         result = [
             self.etq._etq_user,
             self.etq._etq_password,
-            self.etq._env,
             self.etq.base_url,
         ]
         self.assertListEqual(result, expected)

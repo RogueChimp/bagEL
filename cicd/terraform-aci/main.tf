@@ -286,7 +286,7 @@ resource "azurerm_container_group" "etq_cg" {
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
       ETQ_USER = var.etq_user
-      ETQ_ENV = var.etq_env
+      ETQ_BASE_URL = var.etq_base_url
     }
 
     secure_environment_variables =  {

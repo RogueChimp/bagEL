@@ -103,9 +103,9 @@ variable "etq_password" {
   description = "ETQ authentication password"
 }
 
-variable "etq_env" {
+variable "etq_base_url" {
   type        = string
-  description = "ETQ env"
+  description = "ETQ base URL per env"
 }
 
 variable "aha_container_group_name" {
