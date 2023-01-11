@@ -153,3 +153,23 @@ variable "national_vulnerability_database_container_group_name" {
   type        = string
   description = "NVD container-group name in Azure"
 }
+
+variable "liferay_backend_container_group_name" {
+  type        = string
+  description = "Liferay Backend container-group name in Azure"
+}
+
+variable "liferay_backend_user" {
+  type        = string
+  description = "Liferay Backend user"
+}
+
+variable "liferay_backend_secret" {
+  type        = string
+  description = "Liferay Backend service account secret"
+}
+
+variable "liferay_backend_base_url" {
+  type        = string
+  description = "Liferay Backend base URL with environment"
+}

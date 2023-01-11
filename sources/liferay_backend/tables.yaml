@@ -1,0 +1,13 @@
+tables:
+  - name: customers
+    elt_type: delta
+    historical_batch: false
+  - name: users
+    elt_type: delta
+    historical_batch: false
+  - name: user_affiliations
+    elt_type: delta
+    historical_batch: false
+  - name: customer_health_systems
+    elt_type: delta
+    historical_batch: false

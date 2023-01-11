@@ -300,5 +300,46 @@ resource "azurerm_container_group" "etq_cg" {
           protocol = "TCP"
     }
   }
+}
 
+#liferay backend
+resource "azurerm_container_group" "liferay_backend_cg" {
+  name                = var.liferay_backend_container_group_name 
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  restart_policy      = "Never"
+
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
+
+  container {
+    name   = "liferay-backend"
+    image  = "${data.azurerm_container_registry.acr.login_server}/liferay_backend:${var.build_id}"
+    cpu    = "0.5"
+    memory = "1.5"
+ 
+    environment_variables = {
+      AZURE_CONTAINER = var.azure_container
+      AZURE_TABLE = var.azure_table
+      STORAGE_ACCOUNT = var.storage_account
+      STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      LIFERAY_BACKEND_BASE_URL = var.liferay_backend_base_url
+    }
+
+    secure_environment_variables =  {
+      STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      LIFERAY_BACKEND_SECRET = var.liferay_backend_secret
+      LIFERAY_BACKEND_USER = var.liferay_backend_user
+    }
+
+    ports {
+          port     = 443
+          protocol = "TCP"
+    }
+  }
 }
