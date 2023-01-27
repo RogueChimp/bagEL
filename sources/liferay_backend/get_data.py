@@ -130,6 +130,110 @@ class Liferay_backend(BagelIntegration):
                     to_send.append(record)
         yield Bite(to_send)
 
+    def user_sites(self, table: Table, last_run_timestamp, current_timestamp):
+        cust_url = (
+            self._base_url + f"trimedxcore.customer/get-customers?start=-1&end=-1"
+        )
+        customers = self.liferay_get_data(cust_url)
+        to_send = []
+        for cust in customers:
+            customerid = cust["customerId"]
+            user_url = (
+                self._base_url
+                + f"trimedxcore.customer/get-users?customerId={customerid}&start=-1&end=-1"
+            )
+            users = self.liferay_get_data(user_url)
+            for user in users:
+                userid = user["userId"]
+                site_url = (
+                    self._base_url
+                    + f"trimedxcore.customerlocationuser/get-user-sites?customerId={customerid}&userId={userid}"
+                )
+                logging.info(site_url)
+                data = self.liferay_get_data(site_url)
+                for record in data:
+                    if self.is_modified_record(
+                        record, last_run_timestamp, current_timestamp
+                    ):
+                        record["customerId"] = customerid
+                        record["userId"] = userid
+                        to_send.append(record)
+        yield Bite(to_send)
+
+    def user_health_systems(self, table: Table, last_run_timestamp, current_timestamp):
+        cust_url = (
+            self._base_url + f"trimedxcore.customer/get-customers?start=-1&end=-1"
+        )
+        customers = self.liferay_get_data(cust_url)
+        to_send = []
+        for cust in customers:
+            customerid = cust["customerId"]
+            user_url = (
+                self._base_url
+                + f"trimedxcore.customer/get-users?customerId={customerid}&start=-1&end=-1"
+            )
+            users = self.liferay_get_data(user_url)
+            for user in users:
+                userid = user["userId"]
+                health_system_url = (
+                    self._base_url
+                    + f"trimedxcore.customerlocationuser/get-user-health-systems?customerId={customerid}&userId={userid}"
+                )
+                logging.info(health_system_url)
+                data = self.liferay_get_data(health_system_url)
+                for record in data:
+                    if self.is_modified_record(
+                        record, last_run_timestamp, current_timestamp
+                    ):
+                        record["customerId"] = customerid
+                        record["userId"] = userid
+                        to_send.append(record)
+        yield Bite(to_send)
+
+    def customer_affiliations(
+        self, table: Table, last_run_timestamp, current_timestamp
+    ):
+        cust_url = (
+            self._base_url + f"trimedxcore.customer/get-customers?start=-1&end=-1"
+        )
+        customers = self.liferay_get_data(cust_url)
+        to_send = []
+        for cust in customers:
+            customerid = cust["customerId"]
+            affiliations_url = (
+                self._base_url
+                + f"trimedxcore.customerlocation/get-customer-affiliations?customerId={customerid}&start=-1&end=-1"
+            )
+            data = self.liferay_get_data(affiliations_url)
+            for record in data:
+                if self.is_modified_record(
+                    record, last_run_timestamp, current_timestamp
+                ):
+                    record["customerId"] = customerid
+                    to_send.append(record)
+        yield Bite(to_send)
+
+    def customer_sites(self, table: Table, last_run_timestamp, current_timestamp):
+        cust_url = (
+            self._base_url + f"trimedxcore.customer/get-customers?start=-1&end=-1"
+        )
+        customers = self.liferay_get_data(cust_url)
+        to_send = []
+        for cust in customers:
+            customerid = cust["customerId"]
+            sites_url = (
+                self._base_url
+                + f"trimedxcore.customerlocation/get-customer-sites?customerId={customerid}&start=-1&end=-1"
+            )
+            data = self.liferay_get_data(sites_url)
+            for record in data:
+                if self.is_modified_record(
+                    record, last_run_timestamp, current_timestamp
+                ):
+                    record["customerId"] = customerid
+                    to_send.append(record)
+        yield Bite(to_send)
+
     def liferay_get_data(self, url):
         response = requests.get(url, auth=(self._auth_user, self._auth_password))
         if response.status_code != 200:
