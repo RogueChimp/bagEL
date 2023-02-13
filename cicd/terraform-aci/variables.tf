@@ -118,7 +118,6 @@ variable "aha_token" {
   description = "Aha! API token"
 }
 
-
 variable "liferay_analytics_cloud_container_group_name" {
   type        = string
   description = "Liferay Analytics Cloud container-group name in Azure"
@@ -172,4 +171,24 @@ variable "liferay_backend_secret" {
 variable "liferay_backend_base_url" {
   type        = string
   description = "Liferay Backend base URL with environment"
+}
+
+variable "itsm_user" {
+  type        = string
+  description = "ITSM authentication user"
+}
+
+variable "itsm_password" {
+  type        = string
+  description = "ITSM authentication password"
+}
+
+variable "itsm_base_url" {
+  type        = string
+  description = "ITSM base URL per env"
+}
+
+variable "itsm_container_group_name" {
+  type        = string
+  description = "ITSM container-group name in Azure"
 }

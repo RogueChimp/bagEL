@@ -102,3 +102,13 @@ variable "etq_password" {
   type        = string
   description = "ETQ password"
 }
+
+variable "itsm_user" {
+  type        = string
+  description = "ITSM username"
+}
+
+variable "itsm_password" {
+  type        = string
+  description = "ITSM password"
+}

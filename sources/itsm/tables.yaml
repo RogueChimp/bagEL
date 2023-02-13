@@ -1,0 +1,16 @@
+tables:
+  - name: SYS_USER_GROUP
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_COMPLIANCE_INSPECTION_QUESTIONNAIRE
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_COMPLIANCE_REQUEST
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_COMPLIANCE_REQUEST_CATEGORY
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_COMPLIANCE_REQUEST_TYPE
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
