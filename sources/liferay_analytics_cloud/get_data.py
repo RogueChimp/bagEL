@@ -54,7 +54,7 @@ class LiferayAnalyticsCloud(BagelIntegration):
             response = requests.get(url, headers=query)
             data_text = response.text
             if "Content-Type" not in response.headers:
-                raise ValueError(f"...Blank response. Likely an auth problem... {url}")
+                logging.warning(f"...Blank response. Likely an auth problem... {url}")
             status = response.status_code
             if status != 200:
                 logging.error(f"...API Error {status}")

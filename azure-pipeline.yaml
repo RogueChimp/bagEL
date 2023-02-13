@@ -58,7 +58,7 @@ steps:
     inputs:
       versionSpec: 3.8
 
-  - script: pip install black && black . --check
+  - script: pip install black==22.12.0 && black . --check
     displayName: Black formatting/linting
 
   - script: pip install pytest pytest-cov
