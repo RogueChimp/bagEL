@@ -22,9 +22,9 @@ class ITSMData(BagelIntegration):
         self._load_config()
 
     def _load_config(self):
-        self._itsm_user = os.getenv("ITSM_USER")
-        self._itsm_password = os.getenv("ITSM_PASSWORD")
-        self.base_url = os.getenv("ITSM_BASE_URL")
+        self._itsm_user = os.environ["ITSM_USER"]
+        self._itsm_password = os.environ["ITSM_PASSWORD"]
+        self.base_url = os.environ["ITSM_BASE_URL"]
 
     ###########
     # Get URL #

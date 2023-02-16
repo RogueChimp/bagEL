@@ -35,6 +35,6 @@ national_vulnerability_database_container_group_name = "ci-prd-tmx-nc-bagelnatio
 national_vulnerability_database_secret = "#{national_vulnerability_database_secret}#"
 itsm_container_group_name = "ci-prd-tmx-nc-bagelitsm"
 itsm_user = "#{ITSM_USER}#"
-itsm_password = "#{ITSM_PASSWORD}#"
+itsm_password = "#{ITSM-PASSWORD}#"
 itsm_base_url = "https://trimedxllc.service-now.com/api/now/table/"
 env = prd
