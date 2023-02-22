@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 import requests
 import logging
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(
@@ -33,11 +35,16 @@ class ITSMData(BagelIntegration):
     def itsm_get_url(self, table, page_size=50, offset=0):
         param_page_size = f"sysparm_limit={page_size}"
         param_offset = f"sysparm_offset={offset}"
-        param_exclude_link = "sysparm_exclude_reference_link=true"
-        param_include_dv = "sysparm_display_value=all"
-        param_order_by = "sysparm_query=ORDERBYDESCsys_updated_on"
+        PARAM_EXCLUDE_LINK = "sysparm_exclude_reference_link=true"
+        PARAM_INCLUDE_DV = "sysparm_display_value=all"
+        PARAM_ORDER_BY = "sysparm_query=ORDERBYDESCsys_updated_on"
+        PARAM_QA_TABLE_NAME = "table_name=x_ahho_compliance_request"
 
-        table_url = f"{self.base_url}{table}?{param_page_size}&{param_offset}&{param_exclude_link}&{param_include_dv}&{param_order_by}"
+        table_url = f"{self.base_url}{table}?{param_page_size}&{param_offset}&{PARAM_EXCLUDE_LINK}&{PARAM_INCLUDE_DV}&{PARAM_ORDER_BY}"
+
+        # add an extra parameter to this table call to limit large dataset to return only relevant records
+        if table.upper() == "QUESTION_ANSWER":
+            table_url += f"&{PARAM_QA_TABLE_NAME}"
 
         return table_url
 
@@ -47,8 +54,14 @@ class ITSMData(BagelIntegration):
 
     def itsm_api_call(self, url):
 
+        # set up request features to try again in case of ConnectionError (Max retries exceeded with url)
+        session = requests.Session()
+        retry = Retry(connect=3, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount("https://", adapter)
+
         # get the data for this page
-        response = requests.get(url, auth=(self._itsm_user, self._itsm_password))
+        response = session.get(url, auth=(self._itsm_user, self._itsm_password))
         data = response.json()
         data_list = [data]
         total_row_count = int(response.headers["X-Total-Count"])

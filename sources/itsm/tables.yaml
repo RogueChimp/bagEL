@@ -2,6 +2,9 @@ tables:
   - name: SYS_USER_GROUP
     elt_type: delta
     initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_COMPLIANCE_INSPECTION_AGENCY
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
   - name: X_AHHO_COMPLIANCE_INSPECTION_QUESTIONNAIRE
     elt_type: delta
     initial_timestamp: 2012-01-01T00:00:00.0Z
@@ -12,5 +15,14 @@ tables:
     elt_type: delta
     initial_timestamp: 2012-01-01T00:00:00.0Z
   - name: X_AHHO_COMPLIANCE_REQUEST_TYPE
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: U_US_STATE
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: U_PROD_GP_CUSTOMER
+    elt_type: delta
+    initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: QUESTION_ANSWER
     elt_type: delta
     initial_timestamp: 2012-01-01T00:00:00.0Z
