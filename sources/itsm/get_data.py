@@ -37,7 +37,7 @@ class ITSMData(BagelIntegration):
         param_offset = f"sysparm_offset={offset}"
         PARAM_EXCLUDE_LINK = "sysparm_exclude_reference_link=true"
         PARAM_INCLUDE_DV = "sysparm_display_value=all"
-        PARAM_ORDER_BY = "sysparm_query=ORDERBYDESCsys_updated_on"
+        PARAM_ORDER_BY = "sysparm_query=ORDERBYDESCsys_updated_on, u_custname"
         PARAM_QA_TABLE_NAME = "table_name=x_ahho_compliance_request"
 
         table_url = f"{self.base_url}{table}?{param_page_size}&{param_offset}&{PARAM_EXCLUDE_LINK}&{PARAM_INCLUDE_DV}&{PARAM_ORDER_BY}"
