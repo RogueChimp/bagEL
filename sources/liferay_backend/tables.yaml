@@ -5,21 +5,12 @@ tables:
   - name: users
     elt_type: delta
     historical_batch: false
-  - name: user_affiliations
+  - name: locations
     elt_type: delta
     historical_batch: false
-  - name: customer_health_systems
+  - name: user_locations
     elt_type: delta
     historical_batch: false
-  - name: user_sites
-    elt_type: delta
-    historical_batch: false
-  - name: user_health_systems
-    elt_type: delta
-    historical_batch: false
-  - name: customer_affiliations
-    elt_type: delta
-    historical_batch: false
-  - name: customer_sites
+  - name: customer_locations
     elt_type: delta
     historical_batch: false

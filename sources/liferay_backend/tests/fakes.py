@@ -49,12 +49,10 @@ def mock_get_request_200(**kwargs):
     headers = kwargs.get("headers", None)
     json = kwargs.get("json", None)
     return MockResponse(
-        json_data={
-            "val1": "a",
-            "val2": "a",
-            "modifiedDate": 2070600121000,
-            "array": [{"val1": "b"}, {"val1": "c"}],
-        },
+        json_data=[
+            {"col1": 1, "col2": 2},
+            {"col1": 3, "col2": 4},
+        ],
         status_code=200,
     )
 

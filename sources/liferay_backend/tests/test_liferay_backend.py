@@ -1,15 +1,12 @@
 import datetime
+
+from bagel.data import Bite
 import pytest
 import unittest
 from unittest import mock
 from bagel.table import Table
-from ..get_data import Liferay_backend, datetime_to_ms_epoch
-from .fakes import (
-    mock_get_request_200,
-    mock_get_request_200_delta,
-    mock_get_request_404,
-    mock_get_request,
-)
+from ..get_data import Liferay_backend
+from .fakes import mock_get_request_404, mock_get_request_200
 
 
 class TestLiferayBackend(unittest.TestCase):
@@ -18,7 +15,7 @@ class TestLiferayBackend(unittest.TestCase):
         self._auth_user, self._auth_password, self._base_url = [
             "FAKE_USER",
             "FAKE_AUTH_TOKEN",
-            "https://clinicalassetinformaticsdev.trimedx.com/api/jsonws/",
+            "https://example.com/",
         ]
         mock_os_getenv.side_effect = [
             self._auth_user,
@@ -46,77 +43,59 @@ class TestLiferayBackend(unittest.TestCase):
         self.assertListEqual(result, expected)
 
     @pytest.mark.unit_test
+    def test_liferay_backend_get_url(
+        self,
+    ):
+        expected_url = "https://example.com/my-table?startModifiedDate=2022-02-27T15:00:00.000Z&endModifiedDate=2023-02-27T15:00:00.000Z"
+        backend = Liferay_backend()
+        backend._base_url = "https://example.com/"
+        last_run_timestamp = datetime.datetime(2022, 2, 27, 15, 0, 0)
+        current_timestamp = datetime.datetime(2023, 2, 27, 15, 0, 0)
+        table = Table(name="my_table")
+        result = backend.liferay_backend_get_url(
+            table, last_run_timestamp, current_timestamp
+        )
+        assert result == expected_url
+
+    @pytest.mark.unit_test
     @mock.patch("liferay_backend.get_data.requests.get")
     def test_when_api_errors_then_raise_runtime_error(self, mock_requests_get):
         mock_requests_get.return_value = mock_get_request_404()
-
+        backend = Liferay_backend()
         with self.assertRaises(RuntimeError):
-            self.liferay_backend.liferay_get_data("foo")
-
-    @pytest.mark.unit_test
-    def test_when_utility_function_called_then_return_correct_format(self):
-        expected = 1640998861000
-        result = datetime_to_ms_epoch(self.last_run_timestamp)
-        assert result == expected
+            backend.liferay_backend_get_data("foo")
 
     @pytest.mark.unit_test
     @mock.patch("liferay_backend.get_data.Liferay_backend._load_config")
     def test_when_class_instantiated_then_calls_load_config(self, mock_load_config):
         Liferay_backend()
-
         assert mock_load_config.called
 
-    @pytest.mark.unit_test
-    @mock.patch("liferay_backend.get_data.requests.get")
-    def test_when_get_data_has_no_results_then_exits_successfully(
-        self, mock_requests_get
-    ):
-        mock_requests_get.return_value = mock_get_request()
-        try:
-            self.liferay_backend.get_data(
-                Table(name="user_affiliations"),
-                self.current_timestamp,
-                self.last_run_timestamp,
-            )
-        except:
-            pytest.fail("Unexpected error in get_data()")
-
-    @pytest.mark.unit_test
-    @mock.patch("liferay_backend.get_data.requests.get")
-    def test_when_modified_date_is_missing_raise_key_error(self, mock_requests_get):
-        mock_response = mock_get_request().json_data
-
-        with self.assertRaises(KeyError):
-            self.liferay_backend.is_modified_record(
-                mock_response, self.last_run_timestamp, self.current_timestamp
-            )
-
-    @pytest.mark.unit_test
-    def test_when_modified_date_before_last_run_then_true(self):
-        mock_response = mock_get_request_200().json_data
-        result = self.liferay_backend.is_modified_record(
-            mock_response, self.last_run_timestamp, self.current_timestamp
+    @mock.patch("requests.get")
+    def test_get_data(self, mock_requests_get):
+        backend = Liferay_backend()
+        mock_requests_get.return_value = mock_get_request_200()
+        table = Table(name="my_table")
+        current_timestamp = datetime.datetime(
+            9999, 9, 9, 9, 9, 9, tzinfo=datetime.timezone.utc
         )
-        assert result == True
-
-    @pytest.mark.unit_test
-    def test_when_modified_date_before_last_run_then_false(self):
-        mock_response = mock_get_request_200_delta().json_data
-        result = self.liferay_backend.is_modified_record(
-            mock_response, self.last_run_timestamp, self.current_timestamp
+        last_run_timestamp = datetime.datetime(
+            1111, 1, 1, 1, 1, 1, tzinfo=datetime.timezone.utc
         )
-        assert result == False
+        bite = backend.get_data(table, last_run_timestamp, current_timestamp)
+        assert isinstance(bite, Bite)
+        assert bite.data == [{"col1": 1, "col2": 2}, {"col1": 3, "col2": 4}]
 
-    @pytest.mark.unit_test
-    @mock.patch("liferay_backend.get_data.requests.get")
-    def test_when_data_is_return_it_loops_through_results(self, mock_requests_get):
-        mock_requests_get.return_value = mock_get_request_200_delta()
-
-        try:
-            self.liferay_backend.get_data(
-                Table(name="customer_health_systems"),
-                self.current_timestamp,
-                self.last_run_timestamp,
+    @mock.patch("requests.get")
+    def test_get_data_error(self, mock_requests_get):
+        backend = Liferay_backend()
+        mock_requests_get.return_value = mock_get_request_404()
+        with pytest.raises(RuntimeError):
+            table = Table(name="my_table")
+            current_timestamp = datetime.datetime(
+                9999, 9, 9, 9, 9, 9, tzinfo=datetime.timezone.utc
             )
-        except:
-            pytest.fail("Unexpected error in get_data()")
+            last_run_timestamp = datetime.datetime(
+                1111, 1, 1, 1, 1, 1, tzinfo=datetime.timezone.utc
+            )
+            backend.get_data(table, last_run_timestamp, current_timestamp)
