@@ -10,7 +10,9 @@ tables:
     historical_batch: false
   - name: user_locations
     elt_type: delta
-    historical_batch: false
+    historical_batch: true
+    historical_frequency: 2W
   - name: customer_locations
     elt_type: delta
-    historical_batch: false
+    historical_batch: true
+    historical_frequency: 4M
