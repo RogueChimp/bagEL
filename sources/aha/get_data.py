@@ -1,8 +1,10 @@
 import os
-import logging
 import requests
-
+import logging
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bagel import Bagel, BagelIntegration, Bite, Table
+
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -65,8 +67,19 @@ class Aha(BagelIntegration):
 
     def aha_api_call(self, table, url, header, idea_list=False):
 
+        session = requests.Session()
+        retry = Retry(connect=3, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount("https://", adapter)
+
         # get the data for this page and add it to the final list
-        response = requests.get(url, headers=header)
+        response = session.get(url, headers=header)
+
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"ERROR running {url}\n{response.status_code = }\n{response.text}"
+            )
+
         data = response.json()
         data_list = [data]
 
