@@ -48,6 +48,8 @@ class LiferayAnalyticsCloud(BagelIntegration):
     def liferay_analytics_cloud_get_data(self, file_status, url):
         logging.info(f"url: {url}")
         query = {"Authorization": f"Bearer {self.__auth_secret}", "User-Agent": "bagEL"}
+        retry_count = 0
+        max_retry = 360  # 3 hours
         while file_status == "PENDING":
             data = []
             logging.info(f"...looking for file")
@@ -69,6 +71,13 @@ class LiferayAnalyticsCloud(BagelIntegration):
             if any("status" in d for d in data):
                 logging.info("..." + data[0]["status"])
                 time.sleep(30)
+                if retry_count == max_retry:
+                    logging.error(f"...API did not return a response after 3 hours")
+                    raise TimeoutError(
+                        f"API response is not returning data. Stuck in {file_status} status... {url}"
+                    )
+                else:
+                    retry_count += 1
             else:
                 file_status = "COMPLETE"
         return data
