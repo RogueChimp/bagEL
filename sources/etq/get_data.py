@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import requests
 import logging
+
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(

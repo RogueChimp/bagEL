@@ -2,7 +2,6 @@ import calendar
 import logging
 import os
 import requests
-
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 from dotenv import load_dotenv

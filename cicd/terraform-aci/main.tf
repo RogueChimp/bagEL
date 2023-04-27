@@ -37,11 +37,13 @@ resource "azurerm_container_group" "okta_cg" {
       AZURE_TABLE = var.azure_table
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       OKTA_SECRET = var.okta_secret
     }
 
@@ -82,11 +84,13 @@ resource "azurerm_container_group" "looker_cg" {
       LOOKER_API_ENDPOINT = var.looker_api_endpoint
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       LOOKER_CLIENT_SECRET = var.looker_client_secret
     }
 
@@ -124,12 +128,13 @@ resource "azurerm_container_group" "looker_sdk_cg" {
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
       LOOKERSDK_BASE_URL = var.looker_sdk_base_url
       LOOKERSDK_CLIENT_ID = var.looker_sdk_client_id
-      
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       LOOKERSDK_CLIENT_SECRET = var.looker_sdk_client_secret
     }
 
@@ -165,11 +170,13 @@ resource "azurerm_container_group" "aha_cg" {
       AZURE_TABLE = var.azure_table
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       AHA_TOKEN = var.aha_token
     }
 
@@ -205,11 +212,13 @@ resource "azurerm_container_group" "national_vulnerability_database_cg" {
       AZURE_TABLE = var.azure_table
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       NATIONAL_VULNERABILITY_DATABASE_SECRET = var.national_vulnerability_database_secret
     }
 
@@ -246,11 +255,13 @@ resource "azurerm_container_group" "liferay_analytics_cloud_cg" {
       AZURE_TABLE = var.azure_table
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       LIFERAY_ANALYTICS_CLOUD_TOKEN = var.liferay_analytics_cloud_token
     }
 
@@ -288,11 +299,13 @@ resource "azurerm_container_group" "etq_cg" {
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
       ETQ_USER = var.etq_user
       ETQ_BASE_URL = var.etq_base_url
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       ETQ_PASSWORD = var.etq_password
     }
 
@@ -329,11 +342,13 @@ resource "azurerm_container_group" "liferay_backend_cg" {
       STORAGE_ACCOUNT = var.storage_account
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
       LIFERAY_BACKEND_BASE_URL = var.liferay_backend_base_url
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       LIFERAY_BACKEND_SECRET = var.liferay_backend_secret
       LIFERAY_BACKEND_USER = var.liferay_backend_user
     }
@@ -372,11 +387,13 @@ resource "azurerm_container_group" "itsm_cg" {
       STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
       ITSM_USER = var.itsm_user
       ITSM_BASE_URL = var.itsm_base_url
+      ENV = var.env
     }
 
     secure_environment_variables =  {
       STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
       STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
       ITSM_PASSWORD = var.itsm_password
     }
 

@@ -3,6 +3,7 @@ import requests
 import json
 import datetime
 import logging
+
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(

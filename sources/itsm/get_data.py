@@ -4,6 +4,7 @@ import requests
 import logging
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(

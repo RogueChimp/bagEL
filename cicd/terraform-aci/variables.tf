@@ -192,3 +192,13 @@ variable "itsm_container_group_name" {
   type        = string
   description = "ITSM container-group name in Azure"
 }
+
+variable "datadog_api_key_bagel" {
+  type        = string
+  description = "datadog API key used for logging"
+}
+
+variable "env" {
+  type        = string
+  description = "Environment (sbox, np, or prd)"
+}

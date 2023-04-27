@@ -1,7 +1,6 @@
 import os
 import time
 import logging
-
 import pendulum
 import requests
 

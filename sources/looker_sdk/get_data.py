@@ -1,6 +1,7 @@
 import datetime
 import looker_sdk
 import logging
+
 from bagel import Bagel, BagelIntegration, Bite, Table
 
 logging.basicConfig(

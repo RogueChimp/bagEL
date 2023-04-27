@@ -12,7 +12,7 @@ from src.bagel.data import Bite
 from src.bagel.errors import BagelError
 from src.bagel.table import Table
 
-from .fakes import MockStorageClient, MockTimeboxClient
+from .fakes import MockStorageClient, MockTimeboxClient, MockDataDogResponse
 
 
 class TestBagel(unittest.TestCase):
@@ -31,25 +31,24 @@ class TestBagel(unittest.TestCase):
         self.plain_bagel = Bagel(self.test_integration, tb_c, s_c)
 
     @pytest.mark.unit_test
-    @mock.patch("src.bagel.bagel.Bagel._run_table")
     @mock.patch("src.bagel.bagel.Bagel.get_table_list")
+    @mock.patch("src.bagel.bagel.Bagel._run_table")
     @mock.patch("src.bagel.bagel.os.getenv")
+    @mock.patch("src.bagel.bagel.Bagel._log_datadog_error")
     def test_when_error_happens_in_one_table_then_it_keeps_running_other_tables(
-        self, mock_getenv, mock_get_table_list, mock__run_table
+        self, mock_log_datadog_error, mock_getenv, mock__run_table, mock_get_table_list
     ):
+        mock_log_datadog_error.return_value = MockDataDogResponse.mock_get_request_200(
+            json={"status": "success"}, status_code=200
+        )
         mock_getenv.return_value = "asdf"
-        mock_get_table_list.return_value = [
-            {"name": "foo0", "elt_type": "bar0"},
-            {"name": "foo1", "elt_type": "bar1"},
-            {"name": "foo2", "elt_type": "bar2"},
-        ]
+        mock_get_table_list.return_value = [Table("foo0"), Table("foo1"), Table("foo2")]
         mock__run_table.side_effect = [
             Exception("BAD"),
             Exception("STILL BAD"),
             None,
         ]
         bagel = Bagel(self.test_integration)
-        # TODO: figure out exception type
         with self.assertRaises(BagelError):
             bagel.run()
         self.assertEqual(mock__run_table.call_count, 3)
@@ -173,4 +172,100 @@ class TestBagel(unittest.TestCase):
                 self.test_integration.source, "test"
             )
             == expected
+        )
+
+    # @pytest.mark.unit_test
+    # @mock.patch("src.bagel.bagel.Bagel.get_table_list")
+    # @mock.patch("src.bagel.bagel.Bagel._run_table")
+    # @mock.patch("src.bagel.bagel.Bagel._log_datadog_error")
+    # def test_when_error_happens_then_datadog_logs_it(
+    #     self, mock_get_table_list, mock__run_table, mock_log_datadog_error
+    # ):
+    #     mock_get_table_list.return_value = [Table("foo1")]
+    #     mock__run_table.return_value = [Exception("BAD")]
+    #     bagel = Bagel(self.test_integration)
+    #     bagel.run()
+    #     assert mock_log_datadog_error.called
+
+    @pytest.mark.unit_test
+    @mock.patch("src.bagel.bagel.Bagel.get_table_list")
+    @mock.patch("src.bagel.bagel.Bagel._run_table")
+    @mock.patch("src.bagel.bagel.Bagel._log_datadog_error")
+    def test_log_datadog_error(
+        self, mock_log_datadog_error, mock__run_table, mock_get_table_list
+    ):
+        mock_get_table_list.return_value = [Table("foo1")]
+        mock__run_table.return_value = Exception("BAD")
+        bagel = Bagel(self.test_integration)
+        bagel.run()
+        assert mock_log_datadog_error.called_with(
+            {
+                "ddsource": "azurecontainer",
+                "ddtags": f"env:asdf,integration:test_integration,table:foo2",
+                "hostname": "azurecontainer",
+                "message": "Successfully completed processing",
+                "errormessage" "service": "bagEL",
+                "status": "error",
+            }
+        )
+
+    @pytest.mark.unit_test
+    @mock.patch("src.bagel.DataDogLogSubmitter.submit_log")
+    @mock.patch("src.bagel.bagel.Bagel.get_table_list")
+    @mock.patch("src.bagel.bagel.Bagel._run_table")
+    @mock.patch("src.bagel.bagel.os.getenv")
+    def test_log_datadog_info(
+        self,
+        mock_getenv,
+        mock__run_table,
+        mock_get_table_list,
+        mock_submit_log,
+    ):
+        mock_get_table_list.return_value = [Table("foo1")]
+        mock__run_table.return_value = None
+        mock_getenv.return_value = "asdf"
+        bagel = Bagel(self.test_integration)
+        bagel.run()
+        mock_submit_log.return_value = None
+        assert mock_submit_log.called_with(
+            {
+                "ddsource": "azurecontainer",
+                "ddtags": f"env:asdf,integration:test_integration,table:foo1",
+                "hostname": "azurecontainer",
+                "message": "Successfully completed processing",
+                "service": "bagEL",
+                "status": "info",
+            }
+        )
+
+    @pytest.mark.unit_test
+    @mock.patch("src.bagel.DataDogLogSubmitter.submit_log")
+    @mock.patch("src.bagel.bagel.Bagel.get_table_list")
+    @mock.patch("src.bagel.bagel.Bagel._run_table")
+    @mock.patch("src.bagel.bagel.Bagel._log_datadog_error")
+    @mock.patch("src.bagel.bagel.os.getenv")
+    def test_log_datadog_error(
+        self,
+        mock_getenv,
+        mock_log_datadog_error,
+        mock__run_table,
+        mock_get_table_list,
+        mock_submit_log,
+    ):
+        mock_get_table_list.return_value = [Table("foo1")]
+        mock__run_table.return_value = None
+        mock_getenv.return_value = Exception("BAD")
+        bagel = Bagel(self.test_integration)
+        bagel.run()
+        mock_submit_log.return_value = None
+        assert mock_submit_log.called_with(
+            {
+                "ddsource": "azurecontainer",
+                "ddtags": f"env:asdf,integration:test_integration,table:foo1",
+                "hostname": "azurecontainer",
+                "message": "Some error message",
+                "errorMessage": "BAD",
+                "service": "bagEL",
+                "status": "error",
+            }
         )

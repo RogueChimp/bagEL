@@ -18,6 +18,7 @@ from .util import (
     format_timestamp_to_str,
     get_current_timestamp,
 )
+from .datadog_logs import DataDogLogSubmitter
 
 
 class Bagel:
@@ -46,10 +47,12 @@ class Bagel:
 
             try:
                 self._run_table(t)
+                self._log_datadog_info(self.integration.source, t.name)
 
             except Exception as e:
                 errors.append(traceback.format_exc())
                 self.logger.error(e)
+                self._log_datadog_error(e, self.integration.source, t.name)
                 self.logger.error(traceback.format_exc())
 
         if errors:
@@ -176,3 +179,30 @@ class Bagel:
 
         self.storage_client.upload_data(file_name, formatted_data)
         return file_name
+
+    def _log_datadog_error(self, error_message, integration, table_name):
+        log_submitter = DataDogLogSubmitter()
+        env = os.getenv("ENV")
+        log_data = {
+            "ddsource": "azurecontainer",
+            "ddtags": f"env:{env},integration:{integration},table:{table_name}",
+            "hostname": "azurecontainer",
+            "message": str(error_message),
+            "errormessage": str(traceback.format_exc()),
+            "service": "bagEL",
+            "status": "error",
+        }
+        log_submitter.submit_log(log_data)
+
+    def _log_datadog_info(self, integration, table_name):
+        log_submitter = DataDogLogSubmitter()
+        env = os.getenv("ENV")
+        log_data = {
+            "ddsource": "azurecontainer",
+            "ddtags": f"env:{env},integration:{integration},table:{table_name}",
+            "hostname": "azurecontainer",
+            "message": "Successfully completed processing",
+            "service": "bagEL",
+            "status": "info",
+        }
+        log_submitter.submit_log(log_data)

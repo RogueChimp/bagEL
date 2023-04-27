@@ -28,3 +28,29 @@ class MockStorageClient(StorageClient):
 
     def upload_log(self, log: any, file_name: str):
         return f"Log {file_name} uploaded:\n{log}"
+
+
+class MockResponse:
+    def __init__(self, **kwargs):
+        self.json_data = kwargs.get("json_data")
+        self.status_code = kwargs.get("status_code")
+        self.text = kwargs.get("text", "fake text")
+        self.content = kwargs.get("content")
+
+    def json(self):
+        return self.json_data
+
+
+class MockDataDogResponse:
+    def mock_get_request_200(**kwargs):
+        url = kwargs.get("url", None)
+        params = kwargs.get("params", None)
+        headers = kwargs.get("headers", None)
+        json = kwargs.get("json", None)
+        return MockResponse(
+            json_data=[
+                {"col1": 1, "col2": 2},
+                {"col1": 3, "col2": 4},
+            ],
+            status_code=200,
+        )
