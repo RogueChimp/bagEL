@@ -24,11 +24,11 @@
         "scheduled_plan.cron_schedule",
         "scheduled_plan.datagroup",
         "scheduled_plan.updated_time",
-        "scheduled_plan.user_id"
+        "scheduled_plan.user_id",
+        "scheduled_plan.run_once",
+        "scheduled_plan.run_as_recipient"
     ],
-    "filters": {
-        "scheduled_plan.updated_time": "$(FROM) to $(TO)"
-    },
+    "filters": {},
     "sorts": [
         "scheduled_job.finalized_time desc"
     ]

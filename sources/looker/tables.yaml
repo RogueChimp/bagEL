@@ -16,10 +16,6 @@ tables:
   - name: scheduled_plan_destination
     elt_type: full
   - name: scheduled_job
-    elt_type: delta
-    historical_batch: true
-    historical_frequency: D
+    elt_type: full
   - name: scheduled_plan
-    elt_type: delta
-    historical_batch: true
-    historical_frequency: D
+    elt_type: full
