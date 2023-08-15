@@ -1,0 +1,31 @@
+tables:
+  - name: Custom_Documents
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_DocumentFolders
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_DocumentTypes
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_PropertyCharValues
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_PropertyDateValues
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_PropertyFloatValues
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_Propertys
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_ERMTemplates
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_ERMDocTypeTemplates
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z
+  - name: Custom_ERMDocTypes
+    elt_type: delta
+    initial_timestamp: 2023-08-12T00:00:00.0Z

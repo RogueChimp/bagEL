@@ -202,3 +202,28 @@ variable "env" {
   type        = string
   description = "Environment (sbox, np, or prd)"
 }
+
+variable "doclink_container_group_name" {
+  type        = string
+  description = "DocLink container-group name in Azure"
+}
+
+variable "doclink_username" {
+  type        = string
+  description = "DocLink username"
+}
+
+variable "doclink_password" {
+  type        = string
+  description = "DocLink password"
+}
+
+variable "doclink_site_code" {
+  type        = string
+  description = "DocLink site code"
+}
+
+variable "doclink_base_url" {
+  type        = string
+  description = "DocLink base url"
+}

@@ -403,3 +403,48 @@ resource "azurerm_container_group" "itsm_cg" {
     }
   }
 }
+
+# doclink
+resource "azurerm_container_group" "doclink_cg" {
+  name                = var.doclink_container_group_name 
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  restart_policy      = "Never"
+
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
+
+  container {
+    name   = "doclink"
+    image  = "${data.azurerm_container_registry.acr.login_server}/doclink:${var.build_id}"
+    cpu    = "0.5"
+    memory = "1.5"
+ 
+    environment_variables = {
+      AZURE_CONTAINER = var.azure_container
+      AZURE_TABLE = var.azure_table
+      STORAGE_ACCOUNT = var.storage_account
+      STORAGE_ACCOUNT_ENDPOINT = var.storage_account_endpoint
+      ENV = var.env
+      DOCLINK_USERNAME = var.doclink_username
+      DOCLINK_BASE_URL = var.doclink_base_url
+    }
+
+    secure_environment_variables =  {
+      STORAGE_ACCOUNT_KEY = data.azurerm_storage_account.store_acct.primary_access_key
+      STORAGE_ACCOUNT_CONNECTION_STRING = var.storage_account_connection_string
+      DATADOG_API_KEY_BAGEL = var.datadog_api_key_bagel
+      DOCLINK_PASSWORD = var.doclink_password
+      DOCLINK_SITE_CODE = var.doclink_site_code
+    }
+
+    ports {
+          port     = 443
+          protocol = "TCP"
+    }
+  }
+}
