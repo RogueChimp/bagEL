@@ -1,31 +1,56 @@
 tables:
-  - name: Custom_Documents
+  - name: Documents
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_DocumentFolders
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: DocumentFolders
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_DocumentTypes
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: DocumentTypes
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_PropertyCharValues
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: DocumentTypePropertys
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_PropertyDateValues
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: PropertyCharValues
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_PropertyFloatValues
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: PropertyDateValues
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_Propertys
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: PropertyFloatValues
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_ERMTemplates
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: Propertys
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_ERMDocTypeTemplates
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: ERMTemplates
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
-  - name: Custom_ERMDocTypes
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: ERMDocTypeTemplates
     elt_type: delta
-    initial_timestamp: 2023-08-12T00:00:00.0Z
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D
+  - name: ERMDocTypes
+    elt_type: delta
+    initial_timestamp: 2023-08-11T00:00:00.0Z
+    historical_batch: true
+    historical_frequency: D

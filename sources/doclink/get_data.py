@@ -79,8 +79,8 @@ class DocLink(BagelIntegration):
 
         # initialize variables
         query_url = base_url + "ExecProcedure"
-        table = '"' + str(table) + '"'
-        body = f'{{ "ProcedureName": {table}, "Filters": [ {{"ArgumentName": "runDate", "ArgumentValue": "{run_date}"}} ] }}'
+        procedure_name = '"Custom_' + str(table) + '"'
+        body = f'{{ "ProcedureName": {procedure_name}, "Filters": [ {{"ArgumentName": "runDate", "ArgumentValue": "{run_date}"}} ] }}'
         data = {}
         dict_list = []
 
