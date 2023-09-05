@@ -26,3 +26,12 @@ tables:
   - name: QUESTION_ANSWER
     elt_type: delta
     initial_timestamp: 2012-01-01T00:00:00.0Z
+  - name: X_AHHO_LEGAL_CONTRACT_CUSTOMER
+    elt_type: delta
+    initial_timestamp: 2023-08-01T00:00:00.0Z
+  - name: X_AHHO_LEGAL_ENTITLEMENT
+    elt_type: delta
+    initial_timestamp: 2023-08-01T00:00:00.0Z
+  - name: X_AHHO_LEGAL_TERMS_CONDITIONS
+    elt_type: delta
+    initial_timestamp: 2023-08-01T00:00:00.0Z
