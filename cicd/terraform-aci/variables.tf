@@ -227,3 +227,18 @@ variable "doclink_base_url" {
   type        = string
   description = "DocLink base url"
 }
+
+variable "workday_container_group_name" {
+  type        = string
+  description = "Workday container-group name in Azure"
+}
+
+variable "workday_username" {
+  type        = string
+  description = "Workday username"
+}
+
+variable "workday_password" {
+  type        = string
+  description = "Workday password"
+}

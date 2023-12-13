@@ -137,3 +137,13 @@ variable "doclink_base_url" {
   type        = string
   description = "DocLink base url"
 }
+
+variable "workday_username" {
+  type        = string
+  description = "Workday username"
+}
+
+variable "workday_password" {
+  type        = string
+  description = "Workday password"
+}
