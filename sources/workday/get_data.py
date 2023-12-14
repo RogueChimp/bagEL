@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import requests
 import logging
+import json
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -13,7 +14,7 @@ logging.basicConfig(
 )
 
 
-class Template(BagelIntegration):
+class Workday(BagelIntegration):
     source = "workday"
 
     ##############
@@ -31,8 +32,10 @@ class Template(BagelIntegration):
     # Get URL #
     ###########
 
-    def workday_get_url(table, as_of_date, last_run_timestamp, current_timestamp):
-        query_url = f"https://services1.myworkday.com/ccx/service/{table}/trimedx/000003640/TMX_FIN_OUT_EmpByCostCenter?format=json"
+    def workday_get_url(
+        self, report, as_of_date, last_run_timestamp, current_timestamp
+    ):
+        query_url = f"https://services1.myworkday.com/ccx/service/{report}/trimedx/000003640/TMX_FIN_OUT_EmpByCostCenter?format=json"
         as_of_date = "As_of_Date=" + as_of_date
         updated_date_from = "Updated_Date_From=" + last_run_timestamp
         updated_date_to = "Updated_Date_To=" + current_timestamp
@@ -53,7 +56,7 @@ class Template(BagelIntegration):
         session.mount("https://", adapter)
 
         response = session.get(
-            url, auth=(self._workday_username, self._workday_password)
+            url, auth=(self.workday_username, self._workday_password)
         )
 
         if response.status_code != 200:
@@ -72,20 +75,26 @@ class Template(BagelIntegration):
 
     def get_data(self, table: Table, last_run_timestamp, current_timestamp):
         table_name = table.name
-        updated_date_from = last_run_timestamp.strftime("%Y-%m-%d %H:%M:%S")
-        updated_date_to = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        updated_date_from = last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S")
+        updated_date_to = current_timestamp.strftime("%Y-%m-%dT%H:%M:%S")
         as_of_today = updated_date_to
 
-        url = self.workday_get_url(
+        self.url = self.workday_get_url(
             table_name, as_of_today, updated_date_from, updated_date_to
         )
 
-        data = self.workday_api_call(url)
+        data = self.workday_api_call(self.url)
 
-        return Bite(data)
+        yield Bite(data)
 
+        return None
+
+
+######################
+# Ready, Set, Action #
+######################
 
 if __name__ == "__main__":
-    bagel = Bagel(Template())
+    bagel = Bagel(Workday())
 
     bagel.run()
