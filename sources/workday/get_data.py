@@ -77,7 +77,8 @@ class Workday(BagelIntegration):
     def get_data(self, table: Table, last_run_timestamp, current_timestamp):
         table_name = table.name
         updated_date_from = last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-        updated_date_to = updated_date_from + relativedelta(months=1)
+        one_month_forward = last_run_timestamp + relativedelta(months=1)
+        updated_date_to = one_month_forward.strftime("%Y-%m-%dT%H:%M:%S")
         as_of_today = updated_date_to
 
         self.url = self.workday_get_url(
