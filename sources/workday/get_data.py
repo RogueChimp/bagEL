@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import requests
 import logging
 import json
@@ -76,12 +77,13 @@ class Workday(BagelIntegration):
     def get_data(self, table: Table, last_run_timestamp, current_timestamp):
         table_name = table.name
         updated_date_from = last_run_timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-        updated_date_to = current_timestamp.strftime("%Y-%m-%dT%H:%M:%S")
+        updated_date_to = updated_date_from + relativedelta(months=1)
         as_of_today = updated_date_to
 
         self.url = self.workday_get_url(
             table_name, as_of_today, updated_date_from, updated_date_to
         )
+        print(self.url)
 
         data = self.workday_api_call(self.url)
 
