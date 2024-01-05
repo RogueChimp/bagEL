@@ -1,9 +1,7 @@
 import os
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import requests
 import logging
-import json
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
