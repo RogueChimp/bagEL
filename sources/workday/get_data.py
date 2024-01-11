@@ -82,6 +82,8 @@ class Workday(BagelIntegration):
         self.url = self.workday_get_url(
             table_name, as_of_today, updated_date_from, updated_date_to
         )
+
+        # print the URL so that we can see exactly what API call was made in the logs
         print(self.url)
 
         data = self.workday_api_call(self.url)
