@@ -28,9 +28,11 @@ def format_blob_name(
         file_type = "log"
     else:
         file_type = "data"
-    file_name = (
-        f"{system}/{file_type}/{table}/{year}/{month}/{day}/{_file_name}.{file_format}"
-    )
+
+    if file_format == "document":
+        file_name = f"{system}/{file_type}/{table}/{year}/{month}/{day}/{_file_name}"
+    else:
+        file_name = f"{system}/{file_type}/{table}/{year}/{month}/{day}/{_file_name}.{file_format}"
     return file_name
 
 

@@ -102,36 +102,40 @@ class ETQDocuments(BagelIntegration):
         for data in self._docwork_document(
             table, last_run_timestamp, current_timestamp
         ):
-            document = data["Document"][0]
-            fields = document["Fields"]
-            attachment = [f for f in fields if f["fieldName"] == "DOCWORK_ATTACHMENTS"][
-                0
-            ]
+            documents = data["Document"]
 
-            attachment_path = attachment.get("attachmentPath")
-            values = attachment.get("Values")
+            for document in documents:
+                fields = document["Fields"]
 
-            if not attachment_path or not values:
-                continue
+                attachments = [
+                    f for f in fields if f["fieldName"] == "DOCWORK_ATTACHMENTS"
+                ]
 
-            document_id = document["documentId"]
+                for attachment in attachments:
+                    attachment_path = attachment.get("attachmentPath")
+                    values = attachment.get("Values")
 
-            attachment_name_list = [v for v in values if v.lower().endswith(".pdf")]
-            if not attachment_name_list:
-                continue
-            attachment_name = attachment_name_list[0]
+                    if not attachment_path or not values:
+                        continue
 
-            attachment_url = (
-                self.base_url
-                + f"attachments?path={attachment_path}&name={attachment_name}"
-            )
-            logging.info(f"{attachment_url = }")
+                    document_id = document["documentId"]
+                    attachment_name_list = [
+                        v for v in values if v.lower().endswith((".pdf", ".docx"))
+                    ]
 
-            file_content = requests.get(
-                attachment_url, auth=(self._etq_user, self._etq_password)
-            ).content
+                    for attachment_name in attachment_name_list:
+                        attachment_url = (
+                            self.base_url
+                            + f"attachments?path={attachment_path}&name={attachment_name}"
+                        )
+                        logging.info(f"{attachment_url = }")
 
-            yield Bite(file_content, file_name=document_id)
+                        file_content = requests.get(
+                            attachment_url, auth=(self._etq_user, self._etq_password)
+                        ).content
+
+                        combined_file_name = f"{document_id}-{attachment_name}"
+                        yield Bite(file_content, file_name=combined_file_name)
 
     def _get_datasource(self, table: Table, last_run_timestamp, current_timestamp):
         table_name = table.name

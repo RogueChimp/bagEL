@@ -1,13 +1,13 @@
 tables:
   - name: DOCWORK_CLOSED_BYNUMBER
-    elt_type: delta
+    elt_type: full
     initial_timestamp: 2000-01-01T00:00:00.0Z
   - name: DOCWORK_DOCUMENT
     elt_type: delta
     initial_timestamp: 2000-01-01T00:00:00.0Z
   - name: DOCWORK_ATTACHMENT
     elt_type: delta
-    file_format: pdf
+    file_format: document
     initial_timestamp: 2000-01-01T00:00:00.0Z
   - name: CAPA_DATA_TO_SNOWFLAKE_D
     elt_type: full
