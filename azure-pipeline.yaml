@@ -36,6 +36,9 @@ variables:
     - name: env
       value: prd
 
+pool:
+  vmImage: 'ubuntu-22.04'
+
 steps:
   - ${{ if eq(variables['Build.Reason'],'PullRequest') }}:
     - template: code_scan.yml@core

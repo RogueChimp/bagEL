@@ -121,6 +121,7 @@ class Looker(BagelIntegration):
             )
 
     def _set_last_run_time(self, timestamp):
+        ...
         if isinstance(timestamp, datetime.datetime):
             # Want to add 15 minutes to the last run timestamp in order to account for a 10 minute latency w/ Looker API
 
